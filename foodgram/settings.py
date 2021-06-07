@@ -86,10 +86,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
+LOGIN_URL = '/auth/login'
 
-#STATIC_ROOT = 'static'
+LOGIN_REDIRECT_URL = '/'
+
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     'static',
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails') 
