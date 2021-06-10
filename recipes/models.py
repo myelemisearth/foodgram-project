@@ -7,14 +7,12 @@ User = get_user_model()
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=50,
+        unique=True,
         verbose_name='Название',
-    )
-    count = models.PositiveIntegerField(
-        verbose_name='Количество',
     )
     unit = models.CharField(
         max_length=30,
-        verbose_name='Единицы измерения',
+        verbose_name='Единица измерения',
     )
     
     class Meta:
@@ -23,15 +21,19 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингредиенты'
 
 
-class EatingTimes(models.CharField):
+class EatingTimes(models.Model):
     CHOICES = (
         ('Breakfast', 'Breakfast'),
         ('Lunch', 'Lunch'),
         ('Dinner', 'Dinner'),
     )
-    choice = models.CharField(choices=CHOICES)
+    choice = models.CharField(
+        unique=True,
+        choices=CHOICES,
+        max_length=30,
+    )
 
-    
+
 class Recipe(models.Model):
     title = models.CharField(
         max_length=30,
@@ -63,17 +65,36 @@ class Recipe(models.Model):
     )
     tag = models.ManyToManyField(
         EatingTimes,
+        related_name='tag'
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
     )
-    ingredient = models.ForeignKey(
+    ingredient = models.ManyToManyField(
         Ingredient,
-        on_delete=models.DO_NOTHING,
-        verbose_name='Ингредиенты',
+        through='RecipeIngredient',
+        verbose_name='Ингредиент',
     )
 
     class Meta:
         ordering = ('-pub_date',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+
+
+class RecipeIngredient(models.Model):
+    amount = models.PositiveIntegerField(
+        verbose_name='Количество',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='recipe',
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт',
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        related_name='ingredient',
+        on_delete=models.DO_NOTHING,
+        verbose_name='Ингредиент',
+    )

@@ -4,7 +4,7 @@ from .models import Ingredient, Recipe
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'count', 'unit')
+    list_display = ('name', 'unit')
 
 
 class RecipeAdmin(admin.ModelAdmin):
