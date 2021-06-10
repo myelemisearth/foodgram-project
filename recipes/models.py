@@ -9,7 +9,7 @@ class Ingredient(models.Model):
         max_length=50,
         verbose_name='Название',
     )
-    count = models.IntegerField(
+    count = models.PositiveIntegerField(
         verbose_name='Количество',
     )
     unit = models.CharField(
@@ -22,13 +22,17 @@ class Ingredient(models.Model):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
-    
-class Recipe(models.Model):
-    EATING_TIMES = [
+
+class EatingTimes(models.CharField):
+    CHOICES = (
         ('Breakfast', 'Breakfast'),
         ('Lunch', 'Lunch'),
         ('Dinner', 'Dinner'),
-    ]
+    )
+    choice = models.CharField(choices=CHOICES)
+
+    
+class Recipe(models.Model):
     title = models.CharField(
         max_length=30,
         verbose_name='Название',
@@ -57,12 +61,8 @@ class Recipe(models.Model):
         null=True,
         verbose_name='Картинка',
     )
-    tag = models.CharField(
-        max_length=30,
-        choices=EATING_TIMES,
-        blank=True,
-        null=True,
-        verbose_name='Тег',
+    tag = models.ManyToManyField(
+        EatingTimes,
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
