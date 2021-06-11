@@ -32,6 +32,9 @@ class EatingTimes(models.Model):
         choices=CHOICES,
         max_length=30,
     )
+    
+    def __str__(self):
+        return self.choice
 
 
 class Recipe(models.Model):
@@ -65,14 +68,17 @@ class Recipe(models.Model):
     )
     tag = models.ManyToManyField(
         EatingTimes,
-        related_name='tag'
+        related_name='tag',
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
+        help_text='В минутах',
     )
     ingredient = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredient',
+        related_name='ingredients',
+        through_fields=('recipe', 'ingredient',),
         verbose_name='Ингредиент',
     )
 
