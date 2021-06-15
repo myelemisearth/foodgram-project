@@ -1,5 +1,3 @@
-from typing import List
-from django.shortcuts import render
 from django.views.generic import DetailView, ListView
 
 from django.contrib.auth import get_user_model
@@ -10,13 +8,17 @@ User = get_user_model()
 
 class Recipes(ListView):
     queryset = Recipe.objects.all()
-    template_name = 'main/index.html'
+    template_name = 'recipes/index.html'
 
 
 class Recipe(DetailView):
     model = Recipe
-    template_name = 'main/singlepage.html'
+    template_name = 'recipes/singlepage.html'
 
+
+class RecipeEdit(DetailView):
+    model = Recipe
+    template_name = 'recipes/form_recipe.html'
 
 class Basket(ListView):
     pass

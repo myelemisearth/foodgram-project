@@ -18,15 +18,17 @@
         {% endwith %}
         <div class="card__items card__items_column">
           <p class="card__text"><span class="icon-time"></span>{{ recipe.cooking_time }} мин.</p>
-          <p class="card__text"><span class="icon-user"></span> <a href="#" style="color: black"> {{ recipe.author.first_name }}</a></p>
+          <p class="card__text"><span class="icon-user"></span> <a href="#" style="color: black"> 
+            {% if not recipe.author.firstname %} {{ recipe.author.username }} {% else %} {{ recipe.author.first_name }} {% endif %}</a>
+          </p>
         </div>
       </div>
-      <div class="card__footer">
-        {% if user.is_authenticated %}
+      {% if user.is_authenticated %}
+        <div class="card__footer">
           <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
           <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
-        {% endif %}
-      </div>
+        </div>
+      {% endif %}
     </div>
   {% empty %}
     <h3>Список рецептов пуст.</h3>
