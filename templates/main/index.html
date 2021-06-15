@@ -1,5 +1,8 @@
 {% extends "main/base.html" %}
 {% load static %}
+{% block title %}
+  <title>Рецепты</title>
+{% endblock %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'pages/index.css' %}">
 {% endblock %}
@@ -9,4 +12,14 @@
     {% include 'includes/tag.html' %}
   </div>
   {% include 'includes/card_list.html' %}
+  {% block js %}
+    <script src="{% static 'js/components/MainCards.js' %}"></script>
+    <script src="{% static 'js/components/Purchases.js' %}"></script>
+    <script src="{% static 'js/components/Favorites.js' %}"></script>
+    <script src="{% static 'js/config/config.js' %}"></script>
+    <script src="{% static 'js/components/CardList.js' %}"></script>
+    <script src="{% static 'js/components/Header.js' %}"></script>
+    <script src="{% static 'js/api/Api.js' %}"></script>
+    <script src="{% static 'js/templates/indexAuth.js' %}"></script>
+  {% endblock %}
 {% endblock %}
