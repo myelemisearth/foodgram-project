@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.template.defaultfilters import slugify
 
 User = get_user_model()
 
@@ -18,7 +19,7 @@ class Ingredient(models.Model):
         ordering = ('name',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-    
+
     def __str__(self):
         return self.name + ', ' + self.unit
 
@@ -92,6 +93,10 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(Recipe, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title
