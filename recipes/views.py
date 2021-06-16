@@ -1,12 +1,24 @@
+from typing import List
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView
+from django.http import JsonResponse
+from django.core import serializers
 
 from .forms import CreationRecipeForm
-from .models import Recipe
+from .models import Ingredient, Recipe
 
 User = get_user_model()
+
+
+class GetIngredient(ListView):
+    queryset = Ingredient.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data = serializers.serialize('json', queryset)
+        return JsonResponse(data, status=200, safe=False)
 
 
 class CreateRecipe(CreateView):
