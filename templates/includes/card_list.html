@@ -6,15 +6,11 @@
       <div class="card__body">
         <a class="card__title link" href="{% url 'recipes:recipe' pk=recipe.id %}" target="_blank">{{ recipe.title }}</a>
         {% with tags=recipe.tag.all %}
-          {% if tags|length != 0 %}
-            <ul class="card__items">
-              {% for tag in tags %}
-                {% if tag.choice == "lunch" %}<li class="card__item"><span class="badge badge_style_green">Обед</span></li>{% endif %}
-                {% if tag.choice == "breakfast" %}<li class="card__item"><span class="badge badge_style_orange">Завтрак</span></li>{% endif %}
-                {% if tag.choice == "dinner" %}<li class="card__item"><span class="badge badge_style_purple">Ужин</span></li>{% endif %}
-              {% endfor %}
-            </ul>
-          {% endif %}
+          <ul class="card__items">
+            {% for tag in tags %}
+              <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.title }}</span></li>
+            {% endfor %}
+          </ul>
         {% endwith %}
         <div class="card__items card__items_column">
           <p class="card__text"><span class="icon-time"></span>{{ recipe.cooking_time }} мин.</p>

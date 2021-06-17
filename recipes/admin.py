@@ -25,7 +25,8 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 
 
 class EatingTimesAdmin(admin.ModelAdmin):
-    pass
+    model = EatingTimes
+    prepopulated_fields = {'slug': ('title',)}
 
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)

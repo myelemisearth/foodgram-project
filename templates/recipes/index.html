@@ -12,7 +12,9 @@
     {% include 'includes/tag.html' %}
   </div>
   {% include 'includes/card_list.html' %}
-  {% include 'includes/paginator.html' %}
+  {% if page_obj.paginator.count < 2 %}
+    {% include 'includes/paginator.html' %}
+  {% endif %}
   {% block js %}
     <script src="{% static 'js/components/MainCards.js' %}"></script>
     <script src="{% static 'js/components/Purchases.js' %}"></script>

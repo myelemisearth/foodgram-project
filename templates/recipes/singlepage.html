@@ -21,16 +21,12 @@
         {% endif %}
       </div>
       {% with tags=recipe.tag.all %}
-          {% if tags|length != 0 %}
-            <ul class="card__items">
-              {% for tag in tags %}
-                {% if tag.choice == "lunch" %}<li class="card__item"><span class="badge badge_style_green">Обед</span></li>{% endif %}
-                {% if tag.choice == "breakfast" %}<li class="card__item"><span class="badge badge_style_orange">Завтрак</span></li>{% endif %}
-                {% if tag.choice == "dinner" %}<li class="card__item"><span class="badge badge_style_purple">Ужин</span></li>{% endif %}
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
+        <ul class="card__items">
+          {% for tag in tags %}
+            <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.title }}</span></li>
+          {% endfor %}
+        </ul>
+      {% endwith %}
       <div class="single-card__items single-card__items_column">
         <p class="single-card__text"><span class="icon-time"></span>{{ recipe.cooking_time }} мин.</p>
         <ul class="single-card__items">

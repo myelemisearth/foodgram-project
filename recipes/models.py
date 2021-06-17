@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.utils.translation import gettext as _
 
 User = get_user_model()
 
@@ -25,15 +26,20 @@ class Ingredient(models.Model):
 
 
 class EatingTimes(models.Model):
-    CHOICES = (
-        ('breakfast', 'breakfast'),
-        ('lunch', 'lunch'),
-        ('dinner', 'dinner'),
-    )
-    choice = models.CharField(
+    title = models.CharField(
         unique=True,
-        choices=CHOICES,
         max_length=30,
+        verbose_name='Название',
+    )
+    slug = models.CharField(
+        max_length=30,
+        blank=True,
+    )
+    color = models.CharField(
+        max_length=20,
+        null=False,
+        blank=False,
+        verbose_name='Цвет',
     )
 
     class Meta:
@@ -41,18 +47,13 @@ class EatingTimes(models.Model):
         verbose_name_plural = 'Время приема пищи'
 
     def __str__(self):
-        return self.choice
+        return self.title
 
 
 class Recipe(models.Model):
     title = models.CharField(
         max_length=30,
         verbose_name='Название',
-    )
-    slug = models.SlugField(
-        unique=True,
-        max_length=30,
-        verbose_name='Метка',
     )
     description = models.TextField(
         verbose_name='Текстовое описание',
@@ -93,10 +94,6 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        super(Recipe, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title

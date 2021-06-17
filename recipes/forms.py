@@ -7,6 +7,7 @@ class CreationRecipeForm(forms.ModelForm):
     tag = forms.ModelMultipleChoiceField(
         queryset=EatingTimes.objects.all(),
         required=False,
+        to_field_name='slug',
     )
     ingredient = forms.ModelMultipleChoiceField(
         queryset=Ingredient.objects.all(),

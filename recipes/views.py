@@ -1,4 +1,3 @@
-from typing import List
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -30,9 +29,13 @@ class CreateRecipe(CreateView):
         self.object = form.save(commit=False)
         self.object.author = self.request.user
         self.object.save()
+        for item in form.cleaned_data['tag']:
+            self.object.tag.add(item)
         return HttpResponseRedirect(self.get_success_url())
 
+
 class Recipes(ListView):
+    paginate_by = 10
     queryset = Recipe.objects.all()
     template_name = 'recipes/index.html'
 
