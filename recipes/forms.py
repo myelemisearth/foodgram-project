@@ -12,7 +12,10 @@ class CreationRecipeForm(forms.ModelForm):
     ingredient = forms.ModelMultipleChoiceField(
         queryset=Ingredient.objects.all(),
         required=False,
+        to_field_name='name',
     )
+    _ingredient = {}
+    
     class Meta:
         model = Recipe
         fields = ('title', 'description', 'tag', 'ingredient', 'cooking_time',)
