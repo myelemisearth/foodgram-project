@@ -1,6 +1,7 @@
 from django import forms
+from django.http import request
 
-from .models import EatingTimes, Ingredient, Recipe
+from .models import EatingTimes, Ingredient, Recipe, RecipeIngredient
 
 
 class CreationRecipeForm(forms.ModelForm):
@@ -14,8 +15,7 @@ class CreationRecipeForm(forms.ModelForm):
         required=False,
         to_field_name='name',
     )
-    _ingredient = {}
-    
+
     class Meta:
         model = Recipe
-        fields = ('title', 'description', 'tag', 'ingredient', 'cooking_time',)
+        fields = ('title', 'description', 'tag', 'cooking_time', 'ingredient')

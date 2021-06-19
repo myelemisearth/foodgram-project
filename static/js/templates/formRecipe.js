@@ -40,9 +40,7 @@ function Ingredients() {
             elem.classList.add('form__field-item-ingredient');
             elem.id = `ing_${cur}`;
             elem.innerHTML = `<span> ${data.name} ${data.value}${data.units}</span> <span class="form__field-item-delete"></span>
-                             <input id="nameIngredient_${cur}" name="nameIngredient_${cur}" type="hidden" value="${data.name}">
-                             <input id="valueIngredient_${cur}" name="valueIngredient_${cur}" type="hidden" value="${data.value}">
-                             <input id="unitsIngredient_${cur}" name="unitsIngredient_${cur}" type="hidden" value="${data.units}">`;
+                             <input id="ingredient_${cur}" name="ingredient_${cur}" type="hidden" value="${data.name}, ${data.value}">`;
             cur++;
             
             ingredientsContainer.appendChild(elem);
