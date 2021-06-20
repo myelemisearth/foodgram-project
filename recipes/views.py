@@ -84,6 +84,20 @@ class RecipeEditView(LoginRequiredMixin, UpdateView):
             request.POST.update({'ingredient': key})
         return super(RecipeEditView, self).post(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        self.object.save()
+        for item in form.cleaned_data['tag']:
+            self.object.tag.add(item)
+        for item in form.cleaned_data['ingredient']:
+            if item.name in self.ingredient:
+                RecipeIngredient.objects.create(
+                    recipe=self.object,
+                    ingredient=item,
+                    amount=self.ingredient[item.name])
+        return HttpResponseRedirect(self.get_success_url())
+
 
 class BasketView(ListView):
     pass
