@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import CreationRecipeForm
 from .models import Ingredient, Recipe, RecipeIngredient
@@ -20,7 +21,7 @@ class GetIngredient(ListView):
         return JsonResponse(list(queryset), status=200, safe=False)
 
 
-class CreateRecipe(CreateView):
+class CreateRecipeView(LoginRequiredMixin, CreateView):
     form_class = CreationRecipeForm
     success_url = reverse_lazy('recipes:index')
     template_name = 'recipes/form_recipe.html'
@@ -32,7 +33,7 @@ class CreateRecipe(CreateView):
             if key.startswith('ingredient'))
         for key in self.ingredient.keys():
             request.POST.update({'ingredient': key})
-        return super().post(request, *args, **kwargs)
+        return super(CreateRecipeView, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -49,20 +50,40 @@ class CreateRecipe(CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class Recipes(ListView):
+class ProfileView(DetailView):
+    model = User
+    template_name = 'recipes/author_recipe.html'
+
+
+class RecipesListView(ListView):
     paginate_by = 12
     queryset = Recipe.objects.all()
     template_name = 'recipes/index.html'
 
 
-class Recipe(DetailView):
+class RecipeDetailView(DetailView):
     model = Recipe
-    template_name = 'recipes/singlepage.html'
+    template_name = 'recipes/single_page.html'
 
 
-class RecipeEdit(DetailView):
+class RecipeEditView(LoginRequiredMixin, UpdateView):
     model = Recipe
-    template_name = 'recipes/form_recipe.html'
+    form_class = CreationRecipeForm
+    success_url = 'recipes:recipe'
+    template_name = 'recipes/form_recipe_change.html'
 
-class Basket(ListView):
+    def get_success_url(self):
+        return reverse_lazy(self.success_url, kwargs={'pk':self.kwargs.get('pk')})
+    
+    def post(self, request, *args, **kwargs):
+        request.POST = request.POST.copy()
+        self.ingredient = dict(
+            value.split(',') for key, value in request.POST.dict().items()
+            if key.startswith('ingredient'))
+        for key in self.ingredient.keys():
+            request.POST.update({'ingredient': key})
+        return super(RecipeEditView, self).post(request, *args, **kwargs)
+
+
+class BasketView(ListView):
     pass

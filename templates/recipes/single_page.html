@@ -1,5 +1,6 @@
 {% extends "recipes/base.html" %}
 {% load static %}
+{% load thumbnail %}
 {% block title %}
   <title>{{ recipe.title }}</title>
 {% endblock %}
@@ -9,7 +10,9 @@
 {% endblock %}
 {% block content %}
   <div class="single-card" data-id="{{ recipe.id }}" data-author="{{ recipe.author.id }}">
-    <img src="{% static 'images/testCardImg.png' %}" alt="какой-то текст" class="single-card__image">
+    {% thumbnail recipe.image "480x480" crop="center" as image %}
+      <img src="{{ image.url }}" alt="какой-то текст" class="single-card__image">
+    {% endthumbnail %}
     <div class="single-card__info">
       <div class="single-card__header-info">
         <h1 class="single-card__title">{{ recipe.title }}</h1>
@@ -33,7 +36,7 @@
           <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span> 
             {% if not recipe.author.firstname %} {{ recipe.author.username }} {% else %} {{ recipe.author.first_name }} {% endif %}</p>
           </li>
-          {% if user.is_authenticated and recipe.author == request.user %}
+          {% if user.is_authenticated and recipe.author == user %}
             <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'recipes:recipe_edit' pk=recipe.id %}" class="single-card__text">Редактировать рецепт</a></li>
           {% endif %}
         </ul>
@@ -41,7 +44,9 @@
       {% if user.is_authenticated %}
         <ul class="single-card__items">
           <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
-          <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></li>
+          {% if user != recipe.author %}
+            <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></li>
+          {% endif %}
         </ul>
       {% endif %}
       <div class="single-card__section">
@@ -54,7 +59,7 @@
       </div>
       <div class="single-card__section">
         <h3 class="single-card__section-title">Описание:</h3>
-        <p class=" single-card__section-text">{{ recipe.description }}</p>
+        <p class=" single-card__section-text">{{ recipe.description|linebreaks }}</p>
       </div>
     </div>
   </div>

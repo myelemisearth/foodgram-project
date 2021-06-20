@@ -1,22 +1,11 @@
+{% extends 'recipes/base.html' %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Не авторизован.</title>
-    <link rel="stylesheet" href="{% static 'pages/form.css' %}">
-  </head>
-  <body class="body">
-    {% include 'includes/header.html' %}
-    <main class="main container">
-      <div class="main__header">
-        <h2 class="main__title">Вы вышли.</h2>
-      </div>
-      <p class>Благодарим вас за время, проведенное на нашем сайте.</p>
-    </main>
-    {% include 'includes/footer.html' %}
-  </body>
-</html>
+{% block title %}
+  <title>Не авторизован.</title>
+{% endblock %}
+{% block content %}
+  <div class="main__header">
+    <h2 class="main__title">Вы вышли.</h2>
+  </div>
+  <p class>Благодарим вас за время, проведенное на нашем сайте.</p>
+{% endblock %}

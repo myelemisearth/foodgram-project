@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'recipes',
+    'sorl.thumbnail',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +90,10 @@ USE_TZ = True
 LOGIN_URL = '/auth/login'
 
 LOGIN_REDIRECT_URL = '/'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATIC_URL = '/static/'
 
