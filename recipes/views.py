@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 
 from .forms import CreationRecipeForm
-from .models import Ingredient, Recipe, RecipeIngredient
+from .models import EatingTimes, Ingredient, Recipe, RecipeIngredient
 
 User = get_user_model()
 
@@ -64,6 +64,11 @@ class RecipeListView(ListView):
         if tag:
             return Recipe.objects.filter(tag__slug=tag)
         return Recipe.objects.all()
+
+    def render_to_response(self, context, **response_kwargs):
+        tags = EatingTimes.objects.all()
+        context['tags'] = tags
+        return super().render_to_response(context, **response_kwargs)
 
 
 class RecipeDetailView(DetailView):
