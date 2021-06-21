@@ -24,7 +24,14 @@
             {% if 'password' in field.html_name %}
             <input type="password" name="{{ field.html_name }}" id="id_{{ field.label }}" class="form__input">
             {% else %}
-              <input type="text" name="{{ field.html_name }}" id="id_{{ field.label }}" class="form__input">
+              <input
+                type="text"
+                name="{{ field.html_name }}"
+                id="id_{{ field.label }}"
+                class="form__input"
+                {% if field.value %}
+                  value="{{ field.value }}"
+                {% endif %}>
             {% endif %}
             <span class="form__error">{{ field.errors }}</span>
           </div>

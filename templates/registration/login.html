@@ -22,7 +22,7 @@
           </label>
           <div class="form__field-group">
             {% if 'password' in field.html_name %}
-            <input type="password" name="{{ field.html_name }}" id="id_{{ field.label }}" class="form__input">
+              <input type="password" name="{{ field.html_name }}" id="id_{{ field.label }}" class="form__input">
             {% else %}
               <input type="text" name="{{ field.html_name }}" id="id_{{ field.label }}" class="form__input">
             {% endif %}

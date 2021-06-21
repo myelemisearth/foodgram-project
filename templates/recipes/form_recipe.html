@@ -16,7 +16,12 @@
       <div class="form__group">
         <label for="{{ form.title.id_for_label }}" class="form__label">Название рецепта</label>
         <div class="form__field-group">
-          <input type="text" id="id_title" name="{{ form.title.html_name }}" class="form__input">
+          <input
+            type="text" id="id_title"
+            name="{{ form.title.html_name }}"
+            class="form__input"
+            value="{{ form.instance.title }}"
+          >
           <span class="form__error">{{ form.title.errors }}</span>
         </div>
       </div>
@@ -62,7 +67,9 @@
       <div class="form__group">
         <label for="id_description" class="form__label">Описание</label>
         <div class="form__field-group">
-          <textarea name="description" id="id_description" rows="8" class="form__textarea"></textarea>
+          <textarea name="description" id="id_description" rows="8" class="form__textarea">
+            {{ form.instance.description }}
+          </textarea>
           <span class="form__error">{{ form.description.errors }}</span>
         </div>
       </div>
