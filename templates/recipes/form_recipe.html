@@ -69,8 +69,9 @@
       <div class="form__group">
         <span class="form__label">Загрузить фото</span>
         <div class="form__field-group">
-          <input type="file" class="form__file" name="image" id="image">
-          <span class="form__error">{{ form.image.errors }}</span>
+          <label for="id_file" class="form__file-button">Выбрать файл</label>
+          <input type="file" class="form__file" name="{{ form.image.html_name }}" id="id_file">
+          <span class="form__error"></span>
         </div>
       </div>
       <div class="form__footer">

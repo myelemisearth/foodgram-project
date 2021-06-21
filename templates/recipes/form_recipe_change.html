@@ -54,7 +54,7 @@
             <div class="form__field-item-ingredient" id="{{ item.ingredient.id }}">
               <span> {{ item.ingredient.name }} {{ item.amount }}{{ item.ingredient.unit }}.</span>
               <span class="form__field-item-delete"></span>
-              <input id="ingredient_{{ forloop.counter }}" name="ingredient_{{ forloop.counter }}" type="hidden" value="{{ item.ingredient.name }}, {{ item.ingredient.amount }}">
+              <input id="ingredient_{{ forloop.counter }}" name="ingredient_{{ forloop.counter }}" type="hidden" value="{{ item.ingredient.name }}, {{ item.amount }}">
             </div>
             {% endfor %}
           </div>         
@@ -81,12 +81,12 @@
         <span class="form__label">Загрузить фото</span>
         <div class="form__field-group">
           <label for="id_file" class="form__file-button">Выбрать файл</label>
-          <input type="file" class="form__file" name="file" id="id_file">
+          <input type="file" class="form__file" name="{{ form.image.html_name }}" id="id_file">
           <span class="form__error"></span>
         </div>
       </div>
       <div class="form__footer">
-        <button class="button button_style_blue" type="submit">Сохранить</button> <a style="margin-left: 2.5em" href="#" class="form__ingredient-link">Удалить</a>
+        <button class="button button_style_blue" type="submit">Сохранить</button> <a style="margin-left: 2.5em" href="{% url 'recipes:recipe_delete' pk=object.id %}" class="form__ingredient-link">Удалить</a>
       </div>
     </form>
   </div>
