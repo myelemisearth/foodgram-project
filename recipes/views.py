@@ -54,10 +54,16 @@ class ProfileView(DetailView):
     template_name = 'recipes/author_recipe.html'
 
 
-class RecipesListView(ListView):
+class RecipeListView(ListView):
     paginate_by = 12
-    queryset = Recipe.objects.all()
+    #queryset = Recipe.objects.all()
     template_name = 'recipes/index.html'
+
+    def get_queryset(self):
+        tag = self.request.GET.get('tag')
+        if tag:
+            return Recipe.objects.filter(tag__slug=tag)
+        return Recipe.objects.all()
 
 
 class RecipeDetailView(DetailView):
@@ -119,6 +125,7 @@ class RecipeDeleteView(LoginRequiredMixin, DeleteView):
         if self.object.author == request.user:
             self.object.delete()
         return HttpResponseRedirect(success_url)
+
 
 class BasketView(ListView):
     pass

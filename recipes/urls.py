@@ -25,6 +25,6 @@ urlpatterns = [
          views.ProfileView.as_view(),
          name='profile'),
     path('',
-         views.RecipesListView.as_view(),
+         views.RecipeListView.as_view(),
          name='index'),
 ]
