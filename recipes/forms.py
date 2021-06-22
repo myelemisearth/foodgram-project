@@ -1,7 +1,6 @@
 from django import forms
-from django.http import request
 
-from .models import EatingTimes, Ingredient, Recipe, RecipeIngredient
+from .models import EatingTimes, Ingredient, Recipe
 
 
 class CreationRecipeForm(forms.ModelForm):

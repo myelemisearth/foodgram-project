@@ -1,12 +1,15 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, query
 from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import  get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
 
 from .forms import CreationRecipeForm
-from .models import EatingTimes, Ingredient, Recipe, RecipeIngredient
+from .models import EatingTimes, Ingredient, Recipe, RecipeIngredient, Subscription
 
 User = get_user_model()
 
@@ -19,6 +22,32 @@ class GetIngredient(TemplateView):
             .annotate(dimension=F('unit'), title=F('name'))
             .values('title', 'dimension'))
         return JsonResponse(queryset, status=200, safe=False)
+
+
+class SubscriptionView(LoginRequiredMixin, View):
+
+    def check_data(self, data):
+        if 'id' not in data:
+            return JsonResponse({'erorr': 'incorrect request'}, status=400, safe=False)
+        author = get_object_or_404(User, id=data['id'])
+        return author
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        relation = False
+        author = self.check_data(data)
+        if author != request.user and not author.following.filter(user=request.user).exists():
+            relation = Subscription.objects.create(author=author, user=request.user)
+        if relation:
+            return JsonResponse({'status': 'ok'}, status=200, safe=False)
+        return JsonResponse({'error': 'cant create relation'}, status=404, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        author = self.check_data(data)
+        relation = get_object_or_404(Subscription, author=author, user=request.user)
+        relation.delete()
+        return JsonResponse({'status': 'ok'}, status=200, safe=False)
 
 
 class RecipeCreateView(LoginRequiredMixin, CreateView):
@@ -51,7 +80,14 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
 
 class ProfileView(DetailView):
     model = User
+    context_object_name = 'author'
     template_name = 'recipes/author_recipe.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        author = context['author']
+        context['following'] = author.following.filter(user=self.request.user).exists()
+        return context
 
 
 class RecipeListView(ListView):

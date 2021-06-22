@@ -1,22 +1,23 @@
 {% extends "recipes/base.html" %}
 {% load static %}
 {% block title %}
-  <title>{{ user.username }}</title>
+  <title>{{ author.username }}</title>
 {% endblock %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'pages/index.css' %}">
 {% endblock %}
 {% block content %}
   <div class="main__header">
-    <h1 class="main__title">{{ user.username }}</h1>
+    <h1 class="main__title">{{ author.username }}</h1>
     {% include 'includes/tag.html' %}
   </div>
-  {% if request.user.is_authenticated and request.user != user %}
-    <div class="author-subscribe" data-author="{{ user.id }}">
-      <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+  {% if request.user.is_authenticated and request.user != author %}
+    <div class="author-subscribe" data-author="{{ author.id }}">
+      {% csrf_token %}
+      <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" {% if following %}>Отписаться {% else %}data-out>Подписаться на автора{% endif %}</button></p>
     </div>
   {% endif %}
-  {% include 'includes/card_list.html' with object_list=user.recipes.all %}
+  {% include 'includes/card_list.html' with object_list=author.recipes.all %}
   {% block js %}
     <script src="{% static 'js/components/MainCards.js' %}"></script>
     <script src="{% static 'js/components/Purchases.js' %}"></script>

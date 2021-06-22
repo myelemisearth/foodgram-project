@@ -11,7 +11,7 @@
 {% block content %}
   <div class="single-card" data-id="{{ recipe.id }}" data-author="{{ recipe.author.id }}">
     {% thumbnail recipe.image "480x480" crop="center" as image %}
-      <img src="{{ image.url }}" alt="какой-то текст" class="single-card__image">
+      <img src="{{ image.url }}" alt="Картинка к рецепту {{ recipe.title }}" class="single-card__image">
     {% endthumbnail %}
     <div class="single-card__info">
       <div class="single-card__header-info">
@@ -62,8 +62,9 @@
           </li>
           {% if user != recipe.author %}
             <li class="single-card__item">
+              {% csrf_token %}
               <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
-                Подписаться на автора
+                Подписаться на автора {{ following }}
               </button>
             </li>
           {% endif %}
