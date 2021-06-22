@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F
+from django.db.models import F, query
 from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
@@ -56,13 +56,12 @@ class ProfileView(DetailView):
 
 class RecipeListView(ListView):
     paginate_by = 12
-    #queryset = Recipe.objects.all()
     template_name = 'recipes/index.html'
 
     def get_queryset(self):
-        tag = self.request.GET.get('tag')
-        if tag:
-            return Recipe.objects.filter(tag__slug=tag)
+        tags = self.request.GET.getlist('tag')
+        if tags:
+            return Recipe.objects.filter(tag__slug__in=tags).distinct()
         return Recipe.objects.all()
 
     def render_to_response(self, context, **response_kwargs):
@@ -134,3 +133,11 @@ class RecipeDeleteView(LoginRequiredMixin, DeleteView):
 
 class BasketView(ListView):
     pass
+
+
+class FavoriteView(ListView):
+    model = Recipe
+    template_name = 'recipes/favorite.html'
+    
+    def get_queryset(self):
+        return Recipe.objects.filter(author__following__user=self.request.user)

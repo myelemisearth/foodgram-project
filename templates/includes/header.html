@@ -7,8 +7,8 @@
             <a href="{% url 'recipes:index' %}" class="nav__link link">Рецепты</a>
           </li>
           {% if request.user.is_authenticated %}
-            <li class="nav__item {% if url_name == '' %} nav__item_active {% endif %}">
-              <a href="#" class="nav__link link">Мои подписки</a>
+            <li class="nav__item {% if url_name == 'recipes:recipe_favorite' %} nav__item_active {% endif %}">
+              <a href="{% url 'recipes:recipe_favorite' %}" class="nav__link link">Мои подписки</a>
             </li>
             <li class="nav__item {% if url_name == 'recipes:create_recipe' %} nav__item_active {% endif %}">
               <a href="{% url 'recipes:create_recipe' %}" class="nav__link link">Создать рецепт</a>
