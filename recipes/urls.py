@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -6,6 +6,9 @@ urlpatterns = [
     path('recipes/basket/',
          views.BasketView.as_view(),
          name='recipe_basket'),
+    path('recipes/basket/download',
+         views.BasketDownloadView.as_view(),
+         name='recipe_basket_download'),
     path('recipes/create_recipe/',
          views.RecipeCreateView.as_view(),
          name='create_recipe'),
@@ -36,7 +39,7 @@ urlpatterns = [
     path('profile/<int:pk>/',
          views.ProfileView.as_view(),
          name='profile'),
-    path('purchases/',
+    re_path(r'^purchases/(?:(?P<id>\d+)/)?$',
          views.PurchaseView.as_view(),
          name='purchases'),
     path('',

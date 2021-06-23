@@ -1,12 +1,14 @@
+import io
 import json
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
-from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import  get_object_or_404
+from django.http import FileResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
+from reportlab.pdfgen import canvas
 
 from .forms import CreationRecipeForm
 from .models import Busket, EatingTimes, Favorite, Ingredient, Recipe, RecipeIngredient, Subscription
@@ -25,6 +27,12 @@ class PurchaseView(LoginRequiredMixin, View):
             )
         recipe = get_object_or_404(Recipe, id=data['id'])
         return recipe
+
+    def get(self, request, *args, **kwargs):
+        if kwargs['id']:
+            relation = get_object_or_404(Busket, id=kwargs['id'])
+        relation.delete()
+        return redirect('recipes:recipe_basket')
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
@@ -280,9 +288,45 @@ class RecipeDeleteView(LoginRequiredMixin, DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-class BasketView(ListView):
-    model = Recipe
+class BasketView(LoginRequiredMixin, ListView):
     template_name = 'recipes/basket.html'
+    context_object_name = 'basket'
+
+    def get_queryset(self):
+        return Busket.objects.filter(user=self.request.user)
+
+
+class BasketDownloadView(LoginRequiredMixin, View):
+
+    def get_value(self, data):
+        ingredients = {}
+        for i in data:
+            if i.ingredient.name in ingredients:
+                ingredients[i.ingredient.name] += i.amount
+            else:
+                ingredients[i.ingredient.name] = i.amount
+        return ingredients
+
+    def make_file(self, data):
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
+        buffer = io.BytesIO()
+        file = canvas.Canvas(buffer)
+        file.setFont('Verdana', 8)
+        x, y = 30, 750
+        for key, value in data.items():
+            y -= 30
+            file.drawString(x, y, f'{key} : {value}'.encode())
+        file.showPage()
+        file.save()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename='purchases.pdf')
+
+    def get(self, request, *args, **kwargs):
+        queryset = RecipeIngredient.objects.filter(recipe__buyer__user=request.user)
+        value_for_file = self.get_value(queryset)
+        return self.make_file(value_for_file)
 
 
 class FollowView(ListView):
