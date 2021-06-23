@@ -142,3 +142,47 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+
+
+class Favorite(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='favorite_user',
+        verbose_name='Избранный рецепт'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='favorite_recipe',
+        verbose_name='Подписчик'
+    )
+    class Meta:
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+
+
+class Busket(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='buyer',
+        verbose_name='Покупка'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='purchase',
+        verbose_name='Покупатель'
+    )
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'

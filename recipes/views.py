@@ -2,16 +2,59 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F, query
+from django.db.models import F
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import  get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
 
 from .forms import CreationRecipeForm
-from .models import EatingTimes, Ingredient, Recipe, RecipeIngredient, Subscription
+from .models import Busket, EatingTimes, Favorite, Ingredient, Recipe, RecipeIngredient, Subscription
 
 User = get_user_model()
+
+
+class PurchaseView(LoginRequiredMixin, View):
+
+    def check_data(self, data):
+        if 'id' not in data:
+            return JsonResponse(
+                {'erorr': 'incorrect request'},
+                status=400,
+                safe=False
+            )
+        recipe = get_object_or_404(Recipe, id=data['id'])
+        return recipe
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        recipe = self.check_data(data)
+        relation = False
+        if recipe and not recipe.buyer.filter(
+                user=request.user).exists():
+            relation =Busket.objects.create(
+                user=request.user,
+                recipe=recipe
+            )
+        if relation:
+            return JsonResponse(
+                {'status': 'ok'},
+                status=200,
+                safe=False
+            )
+        return JsonResponse(
+                {'error': 'cant create relation'},
+                status=404,
+                safe=False
+            )
+
+    def delete(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        recipe = self.check_data(data)
+        relation = get_object_or_404(
+            Busket, recipe=recipe, user=request.user)
+        relation.delete()
+        return JsonResponse({'status': 'ok'}, status=200, safe=False)
 
 
 class GetIngredient(TemplateView):
@@ -26,6 +69,49 @@ class GetIngredient(TemplateView):
             status=200,
             safe=False
         )
+
+
+class FavoriteView(LoginRequiredMixin, View):
+
+    def check_data(self, data):
+        if 'id' not in data:
+            return JsonResponse(
+                {'erorr': 'incorrect request'},
+                status=400,
+                safe=False
+            )
+        recipe = get_object_or_404(Recipe, id=data['id'])
+        return recipe
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        recipe = self.check_data(data)
+        relation = False
+        if recipe and not recipe.favorite_user.filter(
+                user=request.user).exists():
+            relation =Favorite.objects.create(
+                user=request.user,
+                recipe=recipe
+            )
+        if relation:
+            return JsonResponse(
+                {'status': 'ok'},
+                status=200,
+                safe=False
+            )
+        return JsonResponse(
+                {'error': 'cant create relation'},
+                status=404,
+                safe=False
+            )
+
+    def delete(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        recipe = self.check_data(data)
+        relation = get_object_or_404(
+            Favorite, recipe=recipe, user=request.user)
+        relation.delete()
+        return JsonResponse({'status': 'ok'}, status=200, safe=False)
 
 
 class SubscriptionView(LoginRequiredMixin, View):
@@ -101,12 +187,16 @@ class ProfileView(DetailView):
     model = User
     context_object_name = 'author'
     template_name = 'recipes/author_recipe.html'
-
+  
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         author = context['author']
         context['following'] = author.following.filter(
             user=self.request.user).exists()
+        favorite_recipes = Recipe.objects.filter(favorite_user__user=self.request.user).values_list('id', flat=True)
+        context['favorite_recipes'] = favorite_recipes
+        tags = EatingTimes.objects.all()
+        context['tags'] = tags
         return context
 
 
@@ -120,10 +210,13 @@ class RecipeListView(ListView):
             return Recipe.objects.filter(tag__slug__in=tags).distinct()
         return Recipe.objects.all()
 
-    def render_to_response(self, context, **response_kwargs):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         tags = EatingTimes.objects.all()
         context['tags'] = tags
-        return super().render_to_response(context, **response_kwargs)
+        favorite_recipes = Recipe.objects.filter(favorite_user__user=self.request.user).values_list('id', flat=True)
+        context['favorite_recipes'] = favorite_recipes
+        return context
 
 
 class RecipeDetailView(DetailView):
@@ -188,7 +281,8 @@ class RecipeDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class BasketView(ListView):
-    pass
+    model = Recipe
+    template_name = 'recipes/basket.html'
 
 
 class FollowView(ListView):
@@ -198,3 +292,19 @@ class FollowView(ListView):
     def get_queryset(self):
         return User.objects.prefetch_related('recipes').filter(
             following__user=self.request.user)
+
+
+class FavoriteListView(LoginRequiredMixin, ListView):
+    model = Recipe
+    template_name = 'recipes/favorite.html'
+
+    def get_queryset(self):
+        return Recipe.objects.filter(favorite_user__user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tags = EatingTimes.objects.all()
+        context['tags'] = tags
+        favorite_recipes = Recipe.objects.filter(favorite_user__user=self.request.user).values_list('id', flat=True)
+        context['favorite_recipes'] = favorite_recipes
+        return context

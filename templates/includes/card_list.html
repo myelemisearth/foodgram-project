@@ -11,7 +11,6 @@
         <div class="card__body">
         <a class="card__title link" href="{% url 'recipes:recipe' pk=recipe.id %}" target="_blank">
           {{ recipe.title }}
-        </a>
         {% with tags=recipe.tag.all %}
           <ul class="card__items">
             {% for tag in tags %}
@@ -29,10 +28,16 @@
       </div>
       {% if request.user.is_authenticated %}
         <div class="card__footer">
+          {% csrf_token %}
           <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>
             Добавить в покупки
           </button>
-          <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
+          <button
+            class="button button_style_none"
+            name="favorites"
+            {% if recipe.id not in favorite_recipes %}data-out{% endif %}>
+            <span class="icon-favorite {% if recipe.id in favorite_recipes %}icon-favorite_active {% endif %}"></span>
+          </button>
         </div>
       {% endif %}
     </div>

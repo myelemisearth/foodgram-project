@@ -4,7 +4,7 @@ class Api {
         this.apiUrl =  apiUrl;
     }
   getPurchases () {
-    return fetch(`/purchases`, {
+    return fetch(`/purchases/`, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -17,10 +17,11 @@ class Api {
       })
   }
   addPurchases (id) {
-    return fetch(`/purchases`, {
+    return fetch(`/purchases/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
       },
       body: JSON.stringify({
         id: id
@@ -34,11 +35,15 @@ class Api {
       })
   }
   removePurchases (id){
-    return fetch(`/purchases/${id}`, {
+    return fetch(`/purchases/`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
+      },
+      body: JSON.stringify({
+        id: id
+      })
     })
       .then( e => {
           if(e.ok) {
@@ -84,7 +89,7 @@ class Api {
       })
   }
   addFavorites (id)  {
-    return fetch(`/favorites`, {
+    return fetch(`/favorites/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -102,12 +107,15 @@ class Api {
         })
   }
   removeFavorites (id) {
-    return fetch(`/favorites/${id}`, {
+    return fetch(`/favorites/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value
-      }
+      },
+      body: JSON.stringify({
+        id: id
+      })
     })
         .then( e => {
             if(e.ok) {
