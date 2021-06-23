@@ -63,8 +63,13 @@
           {% if user != recipe.author %}
             <li class="single-card__item">
               {% csrf_token %}
-              <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
-                Подписаться на автора {{ following }}
+              <button class="button button_style_light-blue button_size_subscribe" name="subscribe"
+                {% if following %}>
+                  Отписаться от автора
+                {% else %}              
+                  data-out>
+                  Подписаться на автора
+                {% endif %}
               </button>
             </li>
           {% endif %}

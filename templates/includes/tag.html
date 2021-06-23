@@ -1,4 +1,4 @@
-{% load add_tag_query %}
+{% load user_filters %}
 {% with request.GET|get_tag_list:"tag" as tag_list %}
 <ul class="tags">
   {% for tag in tags %}

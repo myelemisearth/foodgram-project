@@ -17,3 +17,8 @@ def get_tag_url(variable, array):
 @register.filter
 def get_tag_list(variable, arg):
     return variable.getlist(arg)
+
+
+@register.filter
+def get_recipe_remainder(total, displayed):
+    return total - displayed

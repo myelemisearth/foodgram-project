@@ -21,14 +21,22 @@ class GetIngredient(TemplateView):
             name__icontains=self.request.GET.get('query'))
             .annotate(dimension=F('unit'), title=F('name'))
             .values('title', 'dimension'))
-        return JsonResponse(queryset, status=200, safe=False)
+        return JsonResponse(
+            queryset,
+            status=200,
+            safe=False
+        )
 
 
 class SubscriptionView(LoginRequiredMixin, View):
 
     def check_data(self, data):
         if 'id' not in data:
-            return JsonResponse({'erorr': 'incorrect request'}, status=400, safe=False)
+            return JsonResponse(
+                {'erorr': 'incorrect request'},
+                status=400,
+                safe=False
+            )
         author = get_object_or_404(User, id=data['id'])
         return author
 
@@ -36,16 +44,27 @@ class SubscriptionView(LoginRequiredMixin, View):
         data = json.loads(request.body)
         relation = False
         author = self.check_data(data)
-        if author != request.user and not author.following.filter(user=request.user).exists():
-            relation = Subscription.objects.create(author=author, user=request.user)
+        if author != request.user and not author.following.filter(
+                user=request.user).exists():
+            relation = Subscription.objects.create(
+                author=author, user=request.user)
         if relation:
-            return JsonResponse({'status': 'ok'}, status=200, safe=False)
-        return JsonResponse({'error': 'cant create relation'}, status=404, safe=False)
+            return JsonResponse(
+                {'status': 'ok'},
+                status=200,
+                safe=False
+            )
+        return JsonResponse(
+            {'error': 'cant create relation'},
+            status=404,
+            safe=False
+        )
 
     def delete(self, request, *args, **kwargs):
         data = json.loads(request.body)
         author = self.check_data(data)
-        relation = get_object_or_404(Subscription, author=author, user=request.user)
+        relation = get_object_or_404(
+            Subscription, author=author, user=request.user)
         relation.delete()
         return JsonResponse({'status': 'ok'}, status=200, safe=False)
 
@@ -86,7 +105,8 @@ class ProfileView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         author = context['author']
-        context['following'] = author.following.filter(user=self.request.user).exists()
+        context['following'] = author.following.filter(
+            user=self.request.user).exists()
         return context
 
 
@@ -171,9 +191,10 @@ class BasketView(ListView):
     pass
 
 
-class FavoriteView(ListView):
+class FollowView(ListView):
     model = Recipe
-    template_name = 'recipes/favorite.html'
+    template_name = 'recipes/follow.html'
     
     def get_queryset(self):
-        return Recipe.objects.filter(author__following__user=self.request.user)
+        return User.objects.prefetch_related('recipes').filter(
+            following__user=self.request.user)
