@@ -1,0 +1,12 @@
+{% extends "recipes/base.html" %}
+{% load static %}
+{% block title %}
+  <title>404</title>
+{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'pages/index.css' %}">
+{% endblock %}
+{% block content %}
+  <p style="color:black;font-size:36px;">404</p>
+  <p style="color:black;font-size:18px;">Извините, но данной страницы не существует {{ request.build_absolute_uri }}</p>
+{% endblock %}

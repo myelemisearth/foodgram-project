@@ -8,7 +8,7 @@
         class="tags__checkbox tags__checkbox_style_{{ tag.color }}
         {% if tag.slug in tag_list %}
           tags__checkbox_active {% endif %}"
-        href="{%if url_name == 'recipes:profile' %}{% url url_name pk=author.id%}{% else %}{% endif %}{% if not tag.slug in tag_list %}?{{ tag.slug|get_tag_url:tag_list }}{% else %}?{{ tag.slug|get_tag_url:tag_list }}
+        href="{%if url_name == 'recipes:profile' %}{% url url_name pk=author.id%}{% endif %}{% if not tag.slug in tag_list %}?{{ tag.slug|get_tag_url:tag_list }}{% else %}?{{ tag.slug|get_tag_url:tag_list }}
         {% endif %}">
       </a>
       <span class="tags__label">{{ tag.title }}</span>
@@ -17,3 +17,7 @@
   </ul>
   {% endwith %}
 {% endwith %}
+{{ request.get_full_path|cut:"/" }}
+{% if page_obj.number %}
+True
+{% endif %}

@@ -18,13 +18,23 @@
         <h1 class="single-card__title">{{ recipe.title }}</h1>
         {% if request.user.is_authenticated %}
           <div class="single-card__favorite">
-            <button
-              class="button button_style_none"
-              name="favorites"
-              data-out>
-              <span class="icon-favorite icon-favorite_big"></span>
-            </button>
-            <div class="single-card__favorite-tooltip tooltip">Добавить в избранное</div>
+            {% csrf_token %}
+            {% if favorite_recipes %}
+              <button
+                class="button button_style_none"
+                name="favorites">
+                <span class="icon-favorite icon-favorite_big icon-favorite_active"></span>
+              </button>
+              <div class="single-card__favorite-tooltip tooltip">Удалить из избранного</div>
+            {% else %}
+              <button
+                class="button button_style_none"
+                name="favorites"
+                data-out>
+                <span class="icon-favorite icon-favorite_big"></span>
+              </button>
+              <div class="single-card__favorite-tooltip tooltip">Добавить в избранное</div>
+            {% endif %}
           </div>
         {% endif %}
       </div>
@@ -66,7 +76,7 @@
             <li class="single-card__item">
               {% csrf_token %}
               {% if favorite_recipes %}
-              {% include 'includes/buttons/button_subscribe_active.html' %}
+                {% include 'includes/buttons/button_subscribe_active.html' %}
               {% else %}
                 {% include 'includes/buttons/button_subscribe_default.html' %}
               {% endif %}

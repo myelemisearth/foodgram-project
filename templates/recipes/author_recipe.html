@@ -8,7 +8,8 @@
 {% endblock %}
 {% block content %}
   <div class="main__header">
-    <h1 class="main__title">{{ author.username }} {{ recipes }}</h1>
+    <h1 class="main__title">{{ author.username }}</h1>
+    {% include 'includes/tag.html' %}
   </div>
   {% if request.user.is_authenticated and request.user != author %}
     <div class="author-subscribe" data-author="{{ author.id }}">
@@ -22,7 +23,7 @@
       </p>
     </div>
   {% endif %}
-  {% include 'includes/card_list.html' with object_list=author.recipes.all %}
+  {% include 'includes/card_list.html' %}
 {% endblock %}
 {% block js %}
   <script src="{% static 'js/components/MainCards.js' %}"></script>
