@@ -11,6 +11,7 @@
         <div class="card__body">
         <a class="card__title link" href="{% url 'recipes:recipe' pk=recipe.id %}" target="_blank">
           {{ recipe.title }}
+        </a>
         {% with tags=recipe.tag.all %}
           <ul class="card__items">
             {% for tag in tags %}
@@ -21,7 +22,7 @@
         <div class="card__items card__items_column">
           <p class="card__text"><span class="icon-time"></span>{{ recipe.cooking_time }} мин.</p>
           <p class="card__text"><span class="icon-user"></span>
-            <a href="{% url 'recipes:profile' pk=recipe.author.id %}" style="color: black"> 
+            <a href="{% url 'recipes:profile' pk=recipe.author.id %}" style="color: black">
             {% if recipe.author.full_name %} {{ recipe.author.full_name }} {% else %} {{ recipe.author.username }} {% endif %}</a>
           </p>
         </div>
@@ -29,9 +30,9 @@
       {% if request.user.is_authenticated %}
         <div class="card__footer">
           {% csrf_token %}
-          <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>
-            Добавить в покупки
-          </button>
+            <button class="button button_style_light-blue{% if recipe.id in basket_recipes %}-outline{% endif %}" name="purchases" {% if recipe.id not in basket_recipes %}data-out{% endif %}><span class="icon-{% if recipe.id in basket_recipes %}check{% else %}plus{% endif %} button__icon"></span>
+              {% if recipe.id in basket_recipes %}Рецепт добавлен{% else %}Добавить в покупки{% endif %}
+            </button>
           <button
             class="button button_style_none"
             name="favorites"

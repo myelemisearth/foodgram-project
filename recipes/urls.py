@@ -1,6 +1,15 @@
-from django.urls import path, re_path
+from django.urls import include, path, re_path
 
 from . import views
+
+urlpatterns_about = [
+    path('author/',
+         views.AboutView.as_view(),
+         name='author'),
+    path('tech/',
+         views.AboutView.as_view(),
+         name='tech'),
+]
 
 urlpatterns = [
     path('recipes/basket/',
@@ -42,6 +51,7 @@ urlpatterns = [
     re_path(r'^purchases/(?:(?P<id>\d+)/)?$',
          views.PurchaseView.as_view(),
          name='purchases'),
+    path('about/', include(urlpatterns_about)),
     path('',
          views.RecipeListView.as_view(),
          name='index'),

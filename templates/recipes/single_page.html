@@ -16,7 +16,7 @@
     <div class="single-card__info">
       <div class="single-card__header-info">
         <h1 class="single-card__title">{{ recipe.title }}</h1>
-        {% if user.is_authenticated %}
+        {% if request.user.is_authenticated %}
           <div class="single-card__favorite">
             <button
               class="button button_style_none"
@@ -44,7 +44,7 @@
             </a>
             </p>
           </li>
-          {% if user.is_authenticated and recipe.author == user %}
+          {% if request.user.is_authenticated and recipe.author == user %}
             <li class="single-card__item">
               <a style="margin-left: 2.5em" href="{% url 'recipes:recipe_edit' pk=recipe.id %}" class="single-card__text">
                 Редактировать рецепт
@@ -53,24 +53,23 @@
           {% endif %}
         </ul>
       </div>
-      {% if user.is_authenticated %}
+      {% if request.user.is_authenticated %}
         <ul class="single-card__items">
           <li class="single-card__item">
-            <button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span>
-              Добавить в покупки
-            </button>
+            {% if basket_recipes %}
+            {% include 'includes/buttons/button_purchase_active.html' %}
+            {% else %}
+              {% include 'includes/buttons/button_purchase_default.html' %}
+            {% endif %}
           </li>
-          {% if user != recipe.author %}
+          {% if request.user != recipe.author %}
             <li class="single-card__item">
               {% csrf_token %}
-              <button class="button button_style_light-blue button_size_subscribe" name="subscribe"
-                {% if following %}>
-                  Отписаться от автора
-                {% else %}              
-                  data-out>
-                  Подписаться на автора
-                {% endif %}
-              </button>
+              {% if favorite_recipes %}
+              {% include 'includes/buttons/button_subscribe_active.html' %}
+              {% else %}
+                {% include 'includes/buttons/button_subscribe_default.html' %}
+              {% endif %}
             </li>
           {% endif %}
         </ul>

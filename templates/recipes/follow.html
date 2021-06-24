@@ -14,49 +14,51 @@
   </div>
   <div class="card-list">
     {% for author in object_list %}
-    <div class="card-user" data-author="{{ author.id }}">
-      <div class="card-user__header">
-        <h2 class="card-user__title">
-          {% if author.fullname %}
-            {{ author.fullname }}
-          {% else %}
-            {{ author.username }}
-          {% endif %}
-        </h2>
+      <div class="card-user" data-author="{{ author.id }}">
+        <div class="card-user__header">
+          <h2 class="card-user__title">
+            <a href="{% url 'recipes:profile' pk=author.id %}" style="color: black">
+              {% if author.fullname %}
+                {{ author.fullname }}
+              {% else %}
+                {{ author.username }}
+              {% endif %}
+            </a>
+          </h2>
+        </div>
+        <div class="card-user__body">
+          <ul class="card-user__items">
+            {% for recipe in author.recipes.all %}
+              {% if forloop.counter <= 3 %}
+                <li class="card-user__item">
+                  <div class="recipe">
+                    {% thumbnail recipe.image "480x480" crop="center" upscale=True as image %}
+                      <img src="{{ image.url }}" alt="{{ recipe.title }}" class="recipe__image">
+                    {% endthumbnail %}
+                    <h3 class="recipe__title">{{ recipe.title }}</h3>
+                    <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+            <li class="card-user__item">
+              {% with recipe_count=author.recipes.all|length %}
+                <a href="{% url 'recipes:profile' pk=author.id %}" class="card-user__link link">
+                  {% if recipe_count > 3 %}
+                    Еще {{ recipe_count|get_recipe_remainder:3 }} рецептов...
+                  {% else %}
+                    К рецептам автора
+                  {% endif %}
+                </a>
+              {% endwith %}
+            </li>
+          </ul>
+        </div>
+        <div class="card-user__footer">
+          {% csrf_token %}
+          <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться от автора</button>
+        </div>
       </div>
-      <div class="card-user__body">
-        <ul class="card-user__items">
-          {% for recipe in author.recipes.all %}
-            {% if forloop.counter <= 3 %}
-              <li class="card-user__item">
-                <div class="recipe">
-                  {% thumbnail recipe.image "480x480" crop="center" upscale=True as image %}
-                    <img src="{{ image.url }}" alt="{{ recipe.title }}" class="recipe__image">
-                  {% endthumbnail %}
-                  <h3 class="recipe__title">{{ recipe.title }}</h3>
-                  <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
-                </div>
-              </li>
-            {% endif %}
-          {% endfor %}
-          <li class="card-user__item">
-            {% with recipe_count=author.recipes.all|length %}
-              <a href="{% url 'recipes:profile' pk=author.id %}" class="card-user__link link">
-                {% if recipe_count > 3 %}
-                  Еще {{ recipe_count|get_recipe_remainder:3 }} рецептов...
-                {% else %}
-                  К рецептам автора
-                {% endif %}
-              </a>
-            {% endwith %}
-          </li>
-        </ul>
-      </div>
-      <div class="card-user__footer">
-        {% csrf_token %}
-        <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться от автора</button>
-      </div>
-    </div>
     {% endfor %}
   </div>
 {% endblock %}

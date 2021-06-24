@@ -18,7 +18,9 @@
             </li>
             <li class="nav__item {% if url_name == 'recipes:basket' %} nav__item_active {% endif %}">
               <a href="{% url 'recipes:recipe_basket' %}" class="nav__link link">Список покупок</a>
-              <span class="badge badge_style_blue nav__badge" id="counter">{{request.user.purchase.all|length}}</span>
+              {% with request.user.purchase.all|length as purchase_count %}
+                <span class="badge badge_style_blue nav__badge" id="counter">{% if purchase_count > 0 %}{{ purchase_count }}{% endif %}</span>
+              {% endwith %}
             </li>
           {% endif %}
         </ul>

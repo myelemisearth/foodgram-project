@@ -166,7 +166,7 @@ class Favorite(models.Model):
         verbose_name_plural = 'Избранные рецепты'
 
 
-class Busket(models.Model):
+class Basket(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.SET_NULL,

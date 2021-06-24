@@ -16,11 +16,13 @@
       {% for entry in basket %}
         <li class="shopping-list__item" data-id="{{ entry.recipe.id }}">
           <div class="recipe recipe_reverse">
-            {% thumbnail entry.recipe.image "480x480" crop="center" upscale=True as image %}
-              <img src="{{ image.url }}" alt="{{ entry.recipe.title }}" class="recipe__image recipe__image_big">
-            {% endthumbnail %}
-            <h3 class="recipe__title">{{ entry.recipe.title }}</h3>
-            <p class="recipe__text"><span class="icon-time"></span> {{ entry.recipe.cooking_time }} мин.</p>
+            <a class="card__title link" href="{% url 'recipes:recipe' pk=entry.recipe.id %}" target="_blank">
+              {% thumbnail entry.recipe.image "480x480" crop="center" upscale=True as image %}
+                <img src="{{ image.url }}" alt="{{ entry.recipe.title }}" class="recipe__image recipe__image_big">
+              {% endthumbnail %}
+              <h3 class="recipe__title">{{ entry.recipe.title }}</h3>
+              <p class="recipe__text"><span class="icon-time"></span> {{ entry.recipe.cooking_time }} мин.</p>
+            </a>
           </div>
           <a href="{% url 'recipes:purchases' id=entry.id %}" class="shopping-list__button link">Удалить</a>
         </li>

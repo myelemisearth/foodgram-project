@@ -7,13 +7,36 @@ from django.db.models import F
 from django.http import FileResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
+from django.views.generic import (CreateView, DeleteView, DetailView,
+    ListView, UpdateView, View)
+from django.views.generic.base import TemplateView
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
+from foodgram.settings import (ABOUT_AUTHOR_TITLE, ABOUT_AUTHOR_TEXT,
+    ABOUT_TECH_TITLE, ABOUT_TECH_TEXT)
 from .forms import CreationRecipeForm
-from .models import Busket, EatingTimes, Favorite, Ingredient, Recipe, RecipeIngredient, Subscription
+from .models import (Basket, EatingTimes, Favorite, Ingredient, Recipe,
+    RecipeIngredient, Subscription)
+
+pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
 
 User = get_user_model()
+
+
+class AboutView(TemplateView):
+    template_name = 'recipes/about_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'author' in self.request.path:
+            context['title'] = ABOUT_AUTHOR_TITLE
+            context['text'] = ABOUT_AUTHOR_TEXT
+        else:
+            context['title'] = ABOUT_TECH_TITLE
+            context['text'] = ABOUT_TECH_TEXT
+        return context
 
 
 class PurchaseView(LoginRequiredMixin, View):
@@ -30,8 +53,8 @@ class PurchaseView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         if kwargs['id']:
-            relation = get_object_or_404(Busket, id=kwargs['id'])
-        relation.delete()
+            relation = get_object_or_404(Basket, id=kwargs['id'])
+            relation.delete()
         return redirect('recipes:recipe_basket')
 
     def post(self, request, *args, **kwargs):
@@ -40,7 +63,7 @@ class PurchaseView(LoginRequiredMixin, View):
         relation = False
         if recipe and not recipe.buyer.filter(
                 user=request.user).exists():
-            relation =Busket.objects.create(
+            relation =Basket.objects.create(
                 user=request.user,
                 recipe=recipe
             )
@@ -60,12 +83,12 @@ class PurchaseView(LoginRequiredMixin, View):
         data = json.loads(request.body)
         recipe = self.check_data(data)
         relation = get_object_or_404(
-            Busket, recipe=recipe, user=request.user)
+            Basket, recipe=recipe, user=request.user)
         relation.delete()
         return JsonResponse({'status': 'ok'}, status=200, safe=False)
 
 
-class GetIngredient(TemplateView):
+class GetIngredient(View):
 
     def get(self, request, *args, **kwargs):
         queryset = list(Ingredient.objects.filter(
@@ -192,10 +215,15 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
 
 
 class ProfileView(DetailView):
+    paginate_by = 12
     model = User
     context_object_name = 'author'
     template_name = 'recipes/author_recipe.html'
-  
+
+    def get_object(self):
+        object = super().get_object()
+        print(object)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         author = context['author']
@@ -205,6 +233,9 @@ class ProfileView(DetailView):
         context['favorite_recipes'] = favorite_recipes
         tags = EatingTimes.objects.all()
         context['tags'] = tags
+        basket_recipes = Recipe.objects.filter(buyer__user=self.request.user).values_list('id', flat=True)
+        context['basket_recipes'] = basket_recipes
+        print(context)
         return context
 
 
@@ -224,12 +255,23 @@ class RecipeListView(ListView):
         context['tags'] = tags
         favorite_recipes = Recipe.objects.filter(favorite_user__user=self.request.user).values_list('id', flat=True)
         context['favorite_recipes'] = favorite_recipes
+        basket_recipes = Recipe.objects.filter(buyer__user=self.request.user).values_list('id', flat=True)
+        context['basket_recipes'] = basket_recipes
         return context
 
 
 class RecipeDetailView(DetailView):
     model = Recipe
     template_name = 'recipes/single_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        object = self.get_object()
+        favorite_recipes = Favorite.objects.filter(recipe=object.id, user=self.request.user).exists()
+        context['favorite_recipes'] = favorite_recipes
+        basket_recipes = Basket.objects.filter(recipe=object.id, user=self.request.user).exists()
+        context['basket_recipes'] = basket_recipes
+        return context
 
 
 class RecipeEditView(LoginRequiredMixin, UpdateView):
@@ -264,6 +306,7 @@ class RecipeEditView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
+        RecipeIngredient.objects.filter(recipe=self.object.id).delete()
         if self.ingredient:
             for item in form.cleaned_data['ingredient']:
                 RecipeIngredient.objects.update_or_create(
@@ -293,7 +336,7 @@ class BasketView(LoginRequiredMixin, ListView):
     context_object_name = 'basket'
 
     def get_queryset(self):
-        return Busket.objects.filter(user=self.request.user)
+        return Basket.objects.filter(user=self.request.user)
 
 
 class BasketDownloadView(LoginRequiredMixin, View):
@@ -308,16 +351,13 @@ class BasketDownloadView(LoginRequiredMixin, View):
         return ingredients
 
     def make_file(self, data):
-        from reportlab.pdfbase import pdfmetrics
-        from reportlab.pdfbase.ttfonts import TTFont
-        pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
         buffer = io.BytesIO()
         file = canvas.Canvas(buffer)
         file.setFont('Verdana', 8)
-        x, y = 30, 750
+        count, pos_x, pos_y = 30, 830, 1
         for key, value in data.items():
-            y -= 30
-            file.drawString(x, y, f'{key} : {value}'.encode())
+            pos_y -= 15
+            file.drawString(pos_x, pos_y, f'{key} : {value}'.encode())
         file.showPage()
         file.save()
         buffer.seek(0)
@@ -330,6 +370,7 @@ class BasketDownloadView(LoginRequiredMixin, View):
 
 
 class FollowView(ListView):
+    paginate_by = 6
     model = Recipe
     template_name = 'recipes/follow.html'
     
@@ -339,10 +380,14 @@ class FollowView(ListView):
 
 
 class FavoriteListView(LoginRequiredMixin, ListView):
+    paginate_by = 12
     model = Recipe
     template_name = 'recipes/favorite.html'
 
     def get_queryset(self):
+        tags = self.request.GET.getlist('tag')
+        if tags:
+            return Recipe.objects.filter(favorite_user__user=self.request.user).filter(tag__slug__in=tags).distinct()
         return Recipe.objects.filter(favorite_user__user=self.request.user)
 
     def get_context_data(self, **kwargs):
@@ -351,4 +396,6 @@ class FavoriteListView(LoginRequiredMixin, ListView):
         context['tags'] = tags
         favorite_recipes = Recipe.objects.filter(favorite_user__user=self.request.user).values_list('id', flat=True)
         context['favorite_recipes'] = favorite_recipes
+        basket_recipes = Recipe.objects.filter(buyer__user=self.request.user).values_list('id', flat=True)
+        context['basket_recipes'] = basket_recipes
         return context
