@@ -103,15 +103,17 @@ STATICFILES_DIRS = [
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails') 
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 ABOUT_AUTHOR_TITLE = 'Небольшая информация обо мне.'
 
 ABOUT_AUTHOR_TEXT = ('Привет! Рад видеть Вас на моем сайте посвященном '
-    'рецептам разных блюд.\nНе стесняйтесь и оставляйте свои рецепты, '
-    'подписывайтесь на других пользователей и добавляйте рецепты в избранные')
+                     'рецептам разных блюд.\nНе стесняйтесь и оставляйте '
+                     'свои рецепты, подписывайтесь на других пользователей '
+                     'и добавляйте рецепты в избранные')
 
 ABOUT_TECH_TITLE = 'Небольшая информация о технологиях этого сайта'
 
 ABOUT_TECH_TEXT = ('Использовался django 3.2, pillow, reportlab, '
-    'sorl-thumbnail, слёзы и нервы (хорошо, что не кровь).\nПолучайте удовольствие!')
+                   'sorl-thumbnail, слёзы и нервы (хорошо, что не кровь).'
+                   '\nПолучайте удовольствие!')

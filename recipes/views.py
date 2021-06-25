@@ -8,18 +8,18 @@ from django.http import FileResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import (CreateView, DeleteView, DetailView,
-    ListView, UpdateView, View)
+                                  ListView, UpdateView, View)
 from django.views.generic.base import TemplateView
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from foodgram.settings import (ABOUT_AUTHOR_TITLE, ABOUT_AUTHOR_TEXT,
-    ABOUT_TECH_TITLE, ABOUT_TECH_TEXT)
+                               ABOUT_TECH_TITLE, ABOUT_TECH_TEXT)
 
 from .forms import CreationRecipeForm
 from .models import (Basket, EatingTimes, Favorite, Ingredient, Recipe,
-    RecipeIngredient, Subscription)
+                     RecipeIngredient, Subscription)
 
 pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
 
@@ -71,18 +71,18 @@ class PurchaseView(LoginRequiredMixin, CustomCheckDataMixin, View):
         relation = False
         if recipe and not recipe.buyer.filter(
                 user=request.user).exists():
-                relation =Basket.objects.create(
-                    user=request.user,recipe=recipe)
+            relation = Basket.objects.create(
+                user=request.user, recipe=recipe)
         if relation:
             return JsonResponse(
                 {'success': True},
                 status=200,
                 safe=False
-        )
+            )
         return JsonResponse(
-                {'success': False},
-                status=404,
-                safe=False
+            {'success': False},
+            status=404,
+            safe=False
         )
 
     def delete(self, request, *args, **kwargs):
@@ -120,7 +120,7 @@ class FavoriteView(LoginRequiredMixin, CustomCheckDataMixin, View):
         relation = False
         if recipe and not recipe.favorite_user.filter(
                 user=request.user).exists():
-            relation =Favorite.objects.create(
+            relation = Favorite.objects.create(
                 user=request.user,
                 recipe=recipe
             )
@@ -131,9 +131,9 @@ class FavoriteView(LoginRequiredMixin, CustomCheckDataMixin, View):
                 safe=False
             )
         return JsonResponse(
-                {'success': False},
-                status=404,
-                safe=False
+            {'success': False},
+            status=404,
+            safe=False
         )
 
     def delete(self, request, *args, **kwargs):
@@ -221,9 +221,9 @@ class RecipeEditView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy(
             self.success_url,
-            kwargs={'pk':self.kwargs.get('pk')}
+            kwargs={'pk': self.kwargs.get('pk')}
         )
-    
+
     def get(self, request, *args, **kwargs):
         recipe = self.get_object()
         if recipe.author != request.user:
@@ -260,7 +260,7 @@ class RecipeDeleteView(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)
-    
+
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_success_url()
@@ -352,7 +352,8 @@ class BasketListView(LoginRequiredMixin, ListView):
 class BasketDownloadView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        queryset = RecipeIngredient.objects.filter(recipe__buyer__user=request.user)
+        queryset = RecipeIngredient.objects.filter(
+            recipe__buyer__user=request.user)
         value_for_file = self.get_value(queryset)
         return self.make_file(value_for_file)
 
@@ -360,9 +361,11 @@ class BasketDownloadView(LoginRequiredMixin, View):
         ingredients = {}
         for i in data:
             if i.ingredient.name in ingredients:
-                ingredients[i.ingredient.name] += f'{i.amount} {i.ingredient.unit}'
+                ingredients[i.ingredient.name] += (f'{i.amount} '
+                                                   '{i.ingredient.unit}')
             else:
-                ingredients[i.ingredient.name] = f'{i.amount} {i.ingredient.unit}'
+                ingredients[i.ingredient.name] = (f'{i.amount} '
+                                                  '{i.ingredient.unit}')
         return ingredients
 
     def make_file(self, data):
@@ -389,7 +392,7 @@ class FollowListView(ListView):
     paginate_by = 6
     model = Recipe
     template_name = 'recipes/follow.html'
-    
+
     def get_queryset(self):
         return User.objects.prefetch_related('recipes').filter(
             following__user=self.request.user)

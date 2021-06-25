@@ -1,3 +1,5 @@
+import re
+
 from django import template
 
 register = template.Library()
@@ -12,6 +14,15 @@ def get_tag_url(variable, array):
     if variable not in array:
         tag_url += f'tag={variable}'
     return tag_url
+
+
+@register.filter
+def get_paginator_url(array, variable):
+    if 'tag' in array and 'page' in array:
+        return re.sub(r'page=\d+', f'page={variable}', array.urlencode())
+    if 'tag' in array:
+        return array.urlencode() + f'&page={variable}'
+    return f'page={variable}'
 
 
 @register.filter

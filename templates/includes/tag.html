@@ -1,5 +1,4 @@
 {% load user_filters %}
-{% with request.resolver_match.view_name as url_name %}
   {% with request.GET|get_tag_list:"tag" as tag_list %}
   <ul class="tags">
     {% for tag in tags %}
@@ -8,16 +7,10 @@
         class="tags__checkbox tags__checkbox_style_{{ tag.color }}
         {% if tag.slug in tag_list %}
           tags__checkbox_active {% endif %}"
-        href="{%if url_name == 'recipes:profile' %}{% url url_name pk=author.id%}{% endif %}{% if not tag.slug in tag_list %}?{{ tag.slug|get_tag_url:tag_list }}{% else %}?{{ tag.slug|get_tag_url:tag_list }}
-        {% endif %}">
+        href="?{{ tag.slug|get_tag_url:tag_list }}">
       </a>
       <span class="tags__label">{{ tag.title }}</span>
     </li>
     {% endfor %}
   </ul>
-  {% endwith %}
 {% endwith %}
-{{ request.get_full_path|cut:"/" }}
-{% if page_obj.number %}
-True
-{% endif %}

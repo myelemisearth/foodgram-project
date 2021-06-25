@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils.translation import gettext as _
 
 User = get_user_model()
 
@@ -14,7 +13,7 @@ class Ingredient(models.Model):
         max_length=30,
         verbose_name='Единица измерения',
     )
-    
+
     class Meta:
         ordering = ('name',)
         verbose_name = 'Ингредиент'
@@ -139,6 +138,7 @@ class Subscription(models.Model):
         related_name='following',
         verbose_name='Подписуемый'
     )
+
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
@@ -161,6 +161,7 @@ class Favorite(models.Model):
         related_name='favorite_recipe',
         verbose_name='Подписчик'
     )
+
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
@@ -183,6 +184,7 @@ class Basket(models.Model):
         related_name='purchase',
         verbose_name='Покупатель'
     )
+
     class Meta:
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзины'

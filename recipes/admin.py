@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (Basket, EatingTimes, Favorite, Ingredient,
-     Recipe, RecipeIngredient, Subscription)
+                     Recipe, RecipeIngredient, Subscription)
 
 
 class BasketAdmin(admin.ModelAdmin):
@@ -41,6 +41,7 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('author', 'user',)
+
 
 admin.site.register(Basket, BasketAdmin)
 admin.site.register(EatingTimes, EatingTimesAdmin)
