@@ -362,10 +362,10 @@ class BasketDownloadView(LoginRequiredMixin, View):
         for i in data:
             if i.ingredient.name in ingredients:
                 ingredients[i.ingredient.name] += (f'{i.amount} '
-                                                   '{i.ingredient.unit}')
+                                                   f'{i.ingredient.unit}')
             else:
                 ingredients[i.ingredient.name] = (f'{i.amount} '
-                                                  '{i.ingredient.unit}')
+                                                  f'{i.ingredient.unit}')
         return ingredients
 
     def make_file(self, data):
