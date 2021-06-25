@@ -1,0 +1,40 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'pages/form.css' %}">
+{% endblock %}
+{% block title %}
+  <title>Войти на сайт</title>
+{% endblock %}
+{% block content %}
+  <div class="main__header">
+    <h1 class="main__title">Войти на сайт</h1>
+  </div>
+  <div class="form-container">
+    <form class="form" method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form__group">
+          <label for="{{ field.id_for_label }} " class="form__label">{{ field.label }}
+            {% if field.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          <div class="form__field-group">
+            {% if 'password' in field.html_name %}
+              <input type="password" name="{{ field.html_name }}" id="id_{{ field.label }}" class="form__input">
+            {% else %}
+              <input type="text" name="{{ field.html_name }}" id="id_{{ field.label }}" class="form__input">
+            {% endif %}
+            <span class="form__error">{{ field.errors }}</span>
+          </div>
+        </div>
+      {% endfor %}
+      <span class="form__error">{{ form.non_field_errors }}</span>
+      <div class="form__footer">
+        <button class="button button_style_blue" type="submit">Войти</button>
+          <a class="form__forgot-link" href="{% url 'password_reset' %}">Забыли пароль?</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

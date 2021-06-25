@@ -1,0 +1,13 @@
+certifi==2019.9.11        # via requests
+chardet==3.0.4            # via requests
+django
+asgiref
+idna==2.8                 # via requests
+importlib-metadata==1.5.0  # via pluggy, pytest
+pyparsing==2.4.6          # via packaging
+pillow==7.0.0             # via imagefield
+pytz==2019.3              # via django
+six==1.14.0               # via packaging
+sorl-thumbnail==12.6.3
+sqlparse==0.3.0           # via django
+zipp==2.2.0               # via importlib-metadata

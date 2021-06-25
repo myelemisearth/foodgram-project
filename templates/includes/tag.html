@@ -1,0 +1,16 @@
+{% load user_filters %}
+  {% with request.GET|get_tag_list:"tag" as tag_list %}
+  <ul class="tags">
+    {% for tag in tags %}
+    <li class="tags__item">
+      <a id="{{ tag.slug }}"
+        class="tags__checkbox tags__checkbox_style_{{ tag.color }}
+        {% if tag.slug in tag_list %}
+          tags__checkbox_active {% endif %}"
+        href="?{{ tag.slug|get_tag_url:tag_list }}">
+      </a>
+      <span class="tags__label">{{ tag.title }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+{% endwith %}

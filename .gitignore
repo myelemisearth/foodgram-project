@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+# backup files
+*.backup
+
+# Files with data and media
+media/
+*.json
+
 # Distribution / packaging
 .Python
 build/

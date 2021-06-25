@@ -1,0 +1,12 @@
+{% extends "recipes/base.html" %}
+{% load static %}
+{% block title %}
+  <title>Рецепты</title>
+{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'pages/index.css' %}">
+{% endblock %}
+{% block content %}
+  <p style="color:black;font-size:24px;">{{ title }}</p>
+  <p style="color:black;font-size:18px;">{{ text|linebreaks }}</p>
+{% endblock %}

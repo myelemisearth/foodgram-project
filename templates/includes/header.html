@@ -1,0 +1,47 @@
+<header class="header">
+  <nav class="nav">
+    <div class="nav__container container">
+      {% with request.resolver_match.view_name as url_name %}
+        <ul class="nav__items list">        
+          <li class="nav__item {% if url_name == 'recipes:index' %} nav__item_active {% endif %}">
+            <a href="{% url 'recipes:index' %}" class="nav__link link">Рецепты</a>
+          </li>
+          {% if request.user.is_authenticated %}
+            <li class="nav__item {% if url_name == 'recipes:recipe_follow' %} nav__item_active {% endif %}">
+              <a href="{% url 'recipes:recipe_follow' %}" class="nav__link link">Мои подписки</a>
+            </li>
+            <li class="nav__item {% if url_name == 'recipes:create_recipe' %} nav__item_active {% endif %}">
+              <a href="{% url 'recipes:create_recipe' %}" class="nav__link link">Создать рецепт</a>
+            </li>
+            <li class="nav__item {% if url_name == 'recipes:recipe_favorite' %} nav__item_active {% endif %}">
+              <a href="{% url 'recipes:recipe_favorite' %}" class="nav__link link">Избранное</a>
+            </li>
+            <li class="nav__item {% if url_name == 'recipes:basket' %} nav__item_active {% endif %}">
+              <a href="{% url 'recipes:recipe_basket' %}" class="nav__link link">Список покупок</a>
+              {% with request.user.purchase.all|length as purchase_count %}
+                <span class="badge badge_style_blue nav__badge" id="counter">{% if purchase_count > 0 %}{{ purchase_count }}{% endif %}</span>
+              {% endwith %}
+            </li>
+          {% endif %}
+        </ul>
+        <ul class="nav__items list">
+          {% if request.user.is_authenticated %}
+            <li class="nav__item {% if url_name == 'password_change' %} nav__item_active {% endif %}">
+              <a href="{% url 'password_change' %}" class="nav__link link">Изменить пароль</a>
+            </li>
+            <li class="nav__item">
+              <a href="{% url 'logout' %}" class="nav__link link">Выход</a>
+            </li>
+          {% else %}
+            <li class="nav__item {% if url_name == 'login' %} nav__item_active {% endif %}">
+              <a href="{% url 'login' %}" class="nav__link link">Войти</a>
+            </li>
+            <li class="nav__item {% if url_name == 'users:registration' %} nav__item_active {% endif %}">
+              <a href="{% url 'users:registration' %}" class="button button_style_blue">Создать аккаунт</a>
+            </li>
+          {% endif %}
+        </ul>
+      {% endwith %}
+    </div>
+  </nav>
+</header>
