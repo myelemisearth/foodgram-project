@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (Basket, EatingTimes, Favorite, Ingredient,
+from .models import (Basket, EatingTime, Favorite, Ingredient,
                      Recipe, RecipeIngredient, Subscription)
 
 
@@ -9,7 +9,7 @@ class BasketAdmin(admin.ModelAdmin):
 
 
 class EatingTimesAdmin(admin.ModelAdmin):
-    model = EatingTimes
+    model = EatingTime
     prepopulated_fields = {'slug': ('title',)}
 
 
@@ -44,7 +44,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Basket, BasketAdmin)
-admin.site.register(EatingTimes, EatingTimesAdmin)
+admin.site.register(EatingTime, EatingTimesAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)

@@ -1,11 +1,11 @@
 from django import forms
 
-from .models import EatingTimes, Ingredient, Recipe
+from .models import EatingTime, Ingredient, Recipe
 
 
 class CreationRecipeForm(forms.ModelForm):
-    tag = forms.ModelMultipleChoiceField(
-        queryset=EatingTimes.objects.all(),
+    tags = forms.ModelMultipleChoiceField(
+        queryset=EatingTime.objects.all(),
         required=False,
         to_field_name='slug',
     )
@@ -17,4 +17,4 @@ class CreationRecipeForm(forms.ModelForm):
 
     class Meta:
         model = Recipe
-        fields = ('title', 'description', 'tag', 'cooking_time', 'image')
+        fields = ('title', 'description', 'tags', 'cooking_time', 'image')

@@ -2,7 +2,7 @@
 {% load static %}
 {% load thumbnail %}
 {% block title %}
-  <title>{{ recipe.title }}</title>
+  {{ recipe.title }}
 {% endblock %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'pages/single.css' %}">
@@ -38,7 +38,7 @@
           </div>
         {% endif %}
       </div>
-      {% with tags=recipe.tag.all %}
+      {% with tags=recipe.tags.all %}
         <ul class="card__items">
           {% for tag in tags %}
             <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.title }}</span></li>
@@ -87,7 +87,7 @@
       <div class="single-card__section">
         <h3 class="single-card__section-title">Ингридиенты:</h3>
         <div class="single-card__items single-card__items_column">
-          {% for record in recipe.recipe_ingredient.all %}
+          {% for record in recipe.recipe_ingredients.all %}
             <p class=" single-card__section-item">{{ record.ingredient.name }} - {{ record.amount }} {{ record.ingredient.unit }}.
             </p>
           {% endfor %}

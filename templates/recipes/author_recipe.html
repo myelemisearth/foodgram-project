@@ -1,7 +1,7 @@
 {% extends "recipes/base.html" %}
 {% load static %}
 {% block title %}
-  <title>{{ author.username }}</title>
+  {{ author.username }}
 {% endblock %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'pages/index.css' %}">

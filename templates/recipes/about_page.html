@@ -1,7 +1,11 @@
 {% extends "recipes/base.html" %}
 {% load static %}
 {% block title %}
-  <title>Рецепты</title>
+  {% if url_name == 'recipes:author' %}
+    Об авторе
+  {% elif url_name == 'recipes:tech' %}
+    Технологии
+  {% endif %}
 {% endblock %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'pages/index.css' %}">

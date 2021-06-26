@@ -8,8 +8,7 @@ from django.http import FileResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import (CreateView, DeleteView, DetailView,
-                                  ListView, UpdateView, View)
-from django.views.generic.base import TemplateView
+                                  ListView, TemplateView, UpdateView, View)
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -18,7 +17,7 @@ from foodgram.settings import (ABOUT_AUTHOR_TITLE, ABOUT_AUTHOR_TEXT,
                                ABOUT_TECH_TITLE, ABOUT_TECH_TEXT)
 
 from .forms import CreationRecipeForm
-from .models import (Basket, EatingTimes, Favorite, Ingredient, Recipe,
+from .models import (Basket, EatingTime, Favorite, Ingredient, Recipe,
                      RecipeIngredient, Subscription)
 
 pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
@@ -26,11 +25,7 @@ pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
 User = get_user_model()
 
 
-class PageNotFoundView(TemplateView):
-    template_name = 'recipes/misc/page_not_found.html'
-
-
-class CustomCheckDataMixin:
+class CheckDataCustomMixin:
 
     def check_data(self, data, model):
         if 'id' not in data:
@@ -41,6 +36,42 @@ class CustomCheckDataMixin:
             )
         cleaned_data = get_object_or_404(model, id=data['id'])
         return cleaned_data
+
+
+class PrepareDataCustomMixin:
+
+    def prepare_data(self, request):
+        request.POST = request.POST.copy()
+        ingredients = dict(
+            value.split(',') for key, value in request.POST.dict().items()
+            if key.startswith('ingredient'))
+        for key in ingredients.keys():
+            request.POST.update({'ingredient': key})
+        return ingredients
+
+    def create_recipes(self, ingredients, form):
+        if ingredients:
+            for item in form.cleaned_data['ingredient']:
+                RecipeIngredient.objects.create(
+                    recipe=self.object,
+                    ingredient=item,
+                    amount=ingredients[item.name])
+
+
+class GetContextCustomMixin:
+
+    def add_data_to_context(self, context):
+        if self.request.user.is_authenticated:
+            favorite_recipes = Recipe.objects.filter(
+                favorite_user__user=self.request.user).values_list(
+                    'id', flat=True)
+            basket_recipes = Recipe.objects.filter(
+                buyer__user=self.request.user).values_list('id', flat=True)
+            context['basket_recipes'] = basket_recipes
+            context['favorite_recipes'] = favorite_recipes
+        tags = EatingTime.objects.all()
+        context['tags'] = tags
+        return context
 
 
 class AboutView(TemplateView):
@@ -57,7 +88,7 @@ class AboutView(TemplateView):
         return context
 
 
-class PurchaseView(LoginRequiredMixin, CustomCheckDataMixin, View):
+class PurchaseView(LoginRequiredMixin, CheckDataCustomMixin, View):
 
     def get(self, request, *args, **kwargs):
         if kwargs['id']:
@@ -112,7 +143,7 @@ class IngredientView(View):
         )
 
 
-class FavoriteView(LoginRequiredMixin, CustomCheckDataMixin, View):
+class FavoriteView(LoginRequiredMixin, CheckDataCustomMixin, View):
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
@@ -149,7 +180,7 @@ class FavoriteView(LoginRequiredMixin, CustomCheckDataMixin, View):
         )
 
 
-class SubscriptionView(LoginRequiredMixin, CustomCheckDataMixin, View):
+class SubscriptionView(LoginRequiredMixin, CheckDataCustomMixin, View):
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
@@ -183,40 +214,30 @@ class SubscriptionView(LoginRequiredMixin, CustomCheckDataMixin, View):
             safe=False)
 
 
-class RecipeCreateView(LoginRequiredMixin, CreateView):
+class RecipeCreateView(LoginRequiredMixin, PrepareDataCustomMixin, CreateView):
     form_class = CreationRecipeForm
     success_url = reverse_lazy('recipes:index')
     template_name = 'recipes/form_recipe.html'
 
     def post(self, request, *args, **kwargs):
-        request.POST = request.POST.copy()
-        self.ingredient = dict(
-            value.split(',') for key, value in request.POST.dict().items()
-            if key.startswith('ingredient'))
-        for key in self.ingredient.keys():
-            request.POST.update({'ingredient': key})
-        return super(RecipeCreateView, self).post(request, *args, **kwargs)
+        self.ingredients = self.prepare_data(request)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.author = self.request.user
         self.object.save()
-        for item in form.cleaned_data['tag']:
-            self.object.tag.add(item)
-        print(form.cleaned_data['ingredient'])
-        for item in form.cleaned_data['ingredient']:
-            RecipeIngredient.objects.create(
-                recipe=self.object,
-                ingredient=item,
-                amount=self.ingredient[item.name])
+        for item in form.cleaned_data['tags']:
+            self.object.tags.add(item)
+        self.create_recipes(self.ingredients, form)
         return HttpResponseRedirect(self.get_success_url())
 
 
-class RecipeEditView(LoginRequiredMixin, UpdateView):
+class RecipeEditView(LoginRequiredMixin, PrepareDataCustomMixin, UpdateView):
     model = Recipe
     form_class = CreationRecipeForm
     success_url = 'recipes:recipe'
-    template_name = 'recipes/form_recipe_change.html'
+    template_name = 'recipes/form_recipe.html'
 
     def get_success_url(self):
         return reverse_lazy(
@@ -234,23 +255,13 @@ class RecipeEditView(LoginRequiredMixin, UpdateView):
         recipe = self.get_object()
         if recipe.author != request.user:
             return HttpResponseRedirect(self.get_success_url())
-        request.POST = request.POST.copy()
-        self.ingredient = dict(
-            value.split(',') for key, value in request.POST.dict().items()
-            if key.startswith('ingredient'))
-        for key in self.ingredient.keys():
-            request.POST.update({'ingredient': key})
-        return super(RecipeEditView, self).post(request, *args, **kwargs)
+        self.ingredients = self.prepare_data(request)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save()
         RecipeIngredient.objects.filter(recipe=self.object.id).delete()
-        if self.ingredient:
-            for item in form.cleaned_data['ingredient']:
-                RecipeIngredient.objects.update_or_create(
-                    recipe=self.object,
-                    ingredient=item,
-                    defaults={'amount': self.ingredient[item.name]})
+        self.create_recipes(self.ingredients, form)
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -269,7 +280,7 @@ class RecipeDeleteView(LoginRequiredMixin, DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-class ProfileRecipesListView(ListView):
+class ProfileRecipesListView(GetContextCustomMixin, ListView):
     paginate_by = 12
     template_name = 'recipes/author_recipe.html'
 
@@ -278,49 +289,32 @@ class ProfileRecipesListView(ListView):
         tags = self.request.GET.getlist('tag')
         if tags:
             return Recipe.objects.filter(author=self.author).filter(
-                tag__slug__in=tags).distinct()
+                tags__slug__in=tags).distinct()
         return Recipe.objects.filter(author=self.author)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context = self.add_data_to_context(context)
         if self.request.user.is_authenticated:
-            favorite_recipes = Recipe.objects.filter(
-                favorite_user__user=self.request.user).values_list(
-                    'id', flat=True)
-            basket_recipes = Recipe.objects.filter(
-                buyer__user=self.request.user).values_list('id', flat=True)
-            context['basket_recipes'] = basket_recipes
-            context['favorite_recipes'] = favorite_recipes
             context['following'] = self.author.following.filter(
                 user=self.request.user).exists()
-        tags = EatingTimes.objects.all()
-        context['tags'] = tags
         context['author'] = self.author
         return context
 
 
-class RecipeListView(ListView):
+class RecipeListView(GetContextCustomMixin, ListView):
     paginate_by = 12
     template_name = 'recipes/index.html'
 
     def get_queryset(self):
         tags = self.request.GET.getlist('tag')
         if tags:
-            return Recipe.objects.filter(tag__slug__in=tags).distinct()
+            return Recipe.objects.filter(tags__slug__in=tags).distinct()
         return Recipe.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            favorite_recipes = Recipe.objects.filter(
-                favorite_user__user=self.request.user).values_list(
-                    'id', flat=True)
-            basket_recipes = Recipe.objects.filter(
-                buyer__user=self.request.user).values_list('id', flat=True)
-            context['basket_recipes'] = basket_recipes
-            context['favorite_recipes'] = favorite_recipes
-        tags = EatingTimes.objects.all()
-        context['tags'] = tags
+        context = self.add_data_to_context(context)
         return context
 
 
@@ -346,26 +340,28 @@ class BasketListView(LoginRequiredMixin, ListView):
     context_object_name = 'basket'
 
     def get_queryset(self):
-        return Basket.objects.filter(user=self.request.user)
+        return self.request.user.purchase.all()
 
 
 class BasketDownloadView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         queryset = RecipeIngredient.objects.filter(
-            recipe__buyer__user=request.user)
+            recipe__buyer__user=request.user).prefetch_related('ingredient')
         value_for_file = self.get_value(queryset)
         return self.make_file(value_for_file)
 
     def get_value(self, data):
         ingredients = {}
-        for i in data:
-            if i.ingredient.name in ingredients:
-                ingredients[i.ingredient.name] += (f'{i.amount} '
-                                                   f'{i.ingredient.unit}')
+        for item in data:
+            if item.ingredient.name in ingredients:
+                ingredients[item.ingredient.name] += (
+                    f'{item.amount} {item.ingredient.unit}'
+                )
             else:
-                ingredients[i.ingredient.name] = (f'{i.amount} '
-                                                  f'{i.ingredient.unit}')
+                ingredients[item.ingredient.name] = (
+                    f'{item.amount} {item.ingredient.unit}'
+                )
         return ingredients
 
     def make_file(self, data):
@@ -398,7 +394,7 @@ class FollowListView(ListView):
             following__user=self.request.user)
 
 
-class FavoriteListView(LoginRequiredMixin, ListView):
+class FavoriteListView(LoginRequiredMixin, GetContextCustomMixin, ListView):
     paginate_by = 12
     model = Recipe
     template_name = 'recipes/favorite.html'
@@ -408,18 +404,10 @@ class FavoriteListView(LoginRequiredMixin, ListView):
         if tags:
             return Recipe.objects.filter(
                 favorite_user__user=self.request.user).filter(
-                    tag__slug__in=tags).distinct()
+                    tags__slug__in=tags).distinct()
         return Recipe.objects.filter(favorite_user__user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        tags = EatingTimes.objects.all()
-        favorite_recipes = Recipe.objects.filter(
-            favorite_user__user=self.request.user).values_list(
-                'id', flat=True)
-        basket_recipes = Recipe.objects.filter(
-            buyer__user=self.request.user).values_list('id', flat=True)
-        context['basket_recipes'] = basket_recipes
-        context['favorite_recipes'] = favorite_recipes
-        context['tags'] = tags
+        context = self.add_data_to_context(context)
         return context

@@ -1,0 +1,13 @@
+{% extends "recipes/base.html" %}
+{% load static %}
+{% block title %}
+  500
+{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'pages/index.css' %}">
+{% endblock %}
+{% block content %}
+  <p style="color:black;font-size:36px;">500</p>
+  <p style="color:black;font-size:18px;">Внутренняя ошибка сервера!</p>
+  <p style="color:black;font-size:18px;">Извините за предоставленные неудобства. Попробуйте зайти позже.</p>
+{% endblock %}

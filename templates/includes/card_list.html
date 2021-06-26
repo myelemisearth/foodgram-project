@@ -1,4 +1,3 @@
-{% load static %}
 {% load thumbnail %}
 <div class="card-list">
   {% for recipe in object_list %}
@@ -12,7 +11,7 @@
         <a class="card__title link" href="{% url 'recipes:recipe' pk=recipe.id %}" target="_blank">
           {{ recipe.title }}
         </a>
-        {% with tags=recipe.tag.all %}
+        {% with tags=recipe.tags.all %}
           <ul class="card__items">
             {% for tag in tags %}
               <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.title }}</span></li>

@@ -23,7 +23,7 @@ class Ingredient(models.Model):
         return self.name + ', ' + self.unit
 
 
-class EatingTimes(models.Model):
+class EatingTime(models.Model):
     title = models.CharField(
         unique=True,
         max_length=30,
@@ -72,8 +72,8 @@ class Recipe(models.Model):
         null=True,
         verbose_name='Картинка',
     )
-    tag = models.ManyToManyField(
-        EatingTimes,
+    tags = models.ManyToManyField(
+        EatingTime,
         blank=True,
         null=True,
     )
@@ -81,7 +81,7 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         help_text='Минуты',
     )
-    ingredient = models.ManyToManyField(
+    ingredients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredient',
         through_fields=('recipe', 'ingredient',),
@@ -103,13 +103,13 @@ class RecipeIngredient(models.Model):
     )
     recipe = models.ForeignKey(
         Recipe,
-        related_name='recipe_ingredient',
+        related_name='recipe_ingredients',
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
     )
     ingredient = models.ForeignKey(
         Ingredient,
-        related_name='ingredient_recipe',
+        related_name='ingredient_recipes',
         on_delete=models.CASCADE,
         blank=True,
         null=True,
@@ -124,7 +124,7 @@ class RecipeIngredient(models.Model):
 class Subscription(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='follower',
@@ -132,7 +132,7 @@ class Subscription(models.Model):
     )
     author = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='following',
@@ -140,6 +140,11 @@ class Subscription(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('author', 'user'),
+                name='unique_subscription')
+        ]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
@@ -147,7 +152,7 @@ class Subscription(models.Model):
 class Favorite(models.Model):
     recipe = models.ForeignKey(
         Recipe,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='favorite_user',
@@ -155,7 +160,7 @@ class Favorite(models.Model):
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='favorite_recipe',
@@ -170,7 +175,7 @@ class Favorite(models.Model):
 class Basket(models.Model):
     recipe = models.ForeignKey(
         Recipe,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='buyer',
@@ -178,7 +183,7 @@ class Basket(models.Model):
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='purchase',
