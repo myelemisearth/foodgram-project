@@ -6,11 +6,11 @@ User = get_user_model()
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=50,
+        max_length=250,
         verbose_name='Название',
     )
     unit = models.CharField(
-        max_length=30,
+        max_length=250,
         verbose_name='Единица измерения',
     )
 
@@ -26,15 +26,15 @@ class Ingredient(models.Model):
 class EatingTime(models.Model):
     title = models.CharField(
         unique=True,
-        max_length=30,
+        max_length=250,
         verbose_name='Название',
     )
     slug = models.CharField(
-        max_length=30,
+        max_length=250,
         blank=True,
     )
     color = models.CharField(
-        max_length=20,
+        max_length=250,
         null=False,
         blank=False,
         verbose_name='Цвет',
@@ -50,7 +50,7 @@ class EatingTime(models.Model):
 
 class Recipe(models.Model):
     title = models.CharField(
-        max_length=30,
+        max_length=250,
         verbose_name='Название',
     )
     description = models.TextField(
