@@ -4,17 +4,17 @@ import json
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
-from django.http import FileResponse, JsonResponse, HttpResponseRedirect
-from django.shortcuts import redirect, get_object_or_404
+from django.http import FileResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import (CreateView, DeleteView, DetailView,
                                   ListView, TemplateView, UpdateView, View)
-from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
 
-from foodgram.settings import (ABOUT_AUTHOR_TITLE, ABOUT_AUTHOR_TEXT,
-                               ABOUT_TECH_TITLE, ABOUT_TECH_TEXT)
+from foodgram.settings import (ABOUT_AUTHOR_TEXT, ABOUT_AUTHOR_TITLE,
+                               ABOUT_TECH_TEXT, ABOUT_TECH_TITLE)
 
 from .forms import CreationRecipeForm
 from .models import (Basket, EatingTime, Favorite, Ingredient, Recipe,
@@ -34,8 +34,7 @@ class CheckDataCustomMixin:
                 status=400,
                 safe=False
             )
-        cleaned_data = get_object_or_404(model, id=data['id'])
-        return cleaned_data
+        return get_object_or_404(model, id=data['id'])
 
 
 class PrepareDataCustomMixin:
@@ -314,8 +313,7 @@ class RecipeListView(GetContextCustomMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = self.add_data_to_context(context)
-        return context
+        return self.add_data_to_context(context)
 
 
 class RecipeDetailView(DetailView):
@@ -409,5 +407,4 @@ class FavoriteListView(LoginRequiredMixin, GetContextCustomMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = self.add_data_to_context(context)
-        return context
+        return self.add_data_to_context(context)
