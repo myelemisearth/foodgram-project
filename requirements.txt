@@ -6,3 +6,10 @@ sorl-thumbnail
 sqlparse
 zipp
 reportlab
+gunicorn
+flake8
+flake8-broken-line
+flake8-return
+flake8-isort
+pep8-naming
+psycopg2-binary
