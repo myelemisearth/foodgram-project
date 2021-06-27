@@ -12,6 +12,7 @@ __pycache__/
 # Files with data and media
 media/
 *.json
+!ingredients.json
 
 # Distribution / packaging
 .Python
