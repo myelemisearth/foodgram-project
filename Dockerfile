@@ -1,5 +1,4 @@
-FROM scratch
-ADD ubuntu-focal-oci-amd64-root.tar.gz /
+FROM ubuntu:latest
 WORKDIR /code
 COPY . .
 RUN sudo apt-get update || sudo apt-get install python3 python3-pip -y
