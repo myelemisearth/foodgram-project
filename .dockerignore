@@ -7,3 +7,9 @@ ENV
 .ENV/
 .ENV
 media/
+README.md
+docker-compose.yaml
+foodgram_workflow.yaml
+nginx
+setup.cfg
+Dockerfile
