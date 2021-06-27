@@ -42,7 +42,7 @@ class PrepareDataCustomMixin:
     def prepare_data(self, request):
         request.POST = request.POST.copy()
         ingredients = dict(
-            value.split(',') for key, value in request.POST.dict().items()
+            value.split(';') for key, value in request.POST.dict().items()
             if key.startswith('ingredient'))
         for key in ingredients.keys():
             request.POST.update({'ingredient': key})
