@@ -345,7 +345,7 @@ class BasketDownloadView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         queryset = RecipeIngredient.objects.filter(
-            recipe__buyer__user=request.user).prefetch_related('ingredients')
+            recipe__buyer__user=request.user).prefetch_related('ingredient')
         value_for_file = self.get_value(queryset)
         print(queryset)
         print(value_for_file)
