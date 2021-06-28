@@ -355,7 +355,7 @@ class BasketDownloadView(LoginRequiredMixin, View):
             if item.ingredient.name in ingredients:
                 ingredients[item.ingredient.name] += [
                     item.amount, item.ingredient.unit
-                    ]
+                ]
             else:
                 ingredients[item.ingredient.name] = [
                     item.amount, item.ingredient.unit
@@ -374,7 +374,7 @@ class BasketDownloadView(LoginRequiredMixin, View):
             file.drawString(
                 pos_x, pos_y,
                 f'{key} : {value[0]} {value[1]}'.encode()
-                )
+            )
             count += 1
         file.showPage()
         file.save()
