@@ -352,14 +352,10 @@ class BasketDownloadView(LoginRequiredMixin, View):
     def get_value(self, data):
         ingredients = {}
         for item in data:
-            if item.ingredient.name in ingredients:
-                ingredients[item.ingredient.name] += [
-                    item.amount, item.ingredient.unit
-                ]
+            if item.ingredient in ingredients:
+                ingredients[item.ingredient] += item.amount
             else:
-                ingredients[item.ingredient.name] = [
-                    item.amount, item.ingredient.unit
-                ]
+                ingredients[item.ingredient] = item.amount
         return ingredients
 
     def make_file(self, data):
@@ -373,7 +369,7 @@ class BasketDownloadView(LoginRequiredMixin, View):
             pos_y -= 15
             file.drawString(
                 pos_x, pos_y,
-                f'{key} : {value[0]} {value[1]}'.encode()
+                f'{key.name} : {value} {key.unit}'.encode()
             )
             count += 1
         file.showPage()
