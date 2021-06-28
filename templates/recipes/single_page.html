@@ -67,7 +67,7 @@
         <ul class="single-card__items">
           <li class="single-card__item">
             {% if basket_recipes %}
-            {% include 'includes/buttons/button_purchase_active.html' %}
+              {% include 'includes/buttons/button_purchase_active.html' %}
             {% else %}
               {% include 'includes/buttons/button_purchase_default.html' %}
             {% endif %}
@@ -75,7 +75,7 @@
           {% if request.user != recipe.author %}
             <li class="single-card__item">
               {% csrf_token %}
-              {% if favorite_recipes %}
+              {% if following %}
                 {% include 'includes/buttons/button_subscribe_active.html' %}
               {% else %}
                 {% include 'includes/buttons/button_subscribe_default.html' %}
