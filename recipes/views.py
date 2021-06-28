@@ -330,6 +330,9 @@ class RecipeDetailView(DetailView):
                 recipe=object.id, user=self.request.user).exists()
             context['basket_recipes'] = basket_recipes
             context['favorite_recipes'] = favorite_recipes
+            following = object.author.following.filter(
+                user=self.request.user).exists()
+            context['following'] = following
         return context
 
 
