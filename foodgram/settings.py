@@ -14,6 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'recipes',
@@ -119,3 +120,5 @@ ABOUT_TECH_TITLE = 'Небольшая информация о технолог�
 ABOUT_TECH_TEXT = ('Использовался django 3.2, pillow, reportlab, '
                    'sorl-thumbnail, слёзы и нервы (хорошо, что не кровь).'
                    '\nПолучайте удовольствие!')
+
+SITE_ID = 1
