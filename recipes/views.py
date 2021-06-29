@@ -384,7 +384,7 @@ class BasketDownloadView(LoginRequiredMixin, View):
             filename='purchases.pdf')
 
 
-class FollowListView(ListView):
+class FollowListView(LoginRequiredMixin, ListView):
     paginate_by = 6
     model = Recipe
     template_name = 'recipes/follow.html'
